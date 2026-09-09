@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import sys
 from pathlib import Path
 from typing import Iterable
 
@@ -681,6 +682,7 @@ def train_sources(args) -> dict:
     stop_reason = None
     with SourceLedger(args.ledger) as ledger:
         for epoch in range(args.epochs):
+            epoch_losses = {task: [] for task in losses}
             for source in iter_sources(training_specs, args.max_bytes, ledger, args.license_policy):
                 language_name = normalize_language(source.spec.language or "text")
                 language = language_index(language_name)
@@ -705,14 +707,17 @@ def train_sources(args) -> dict:
                                        role_targets, language,
                                        args.sequence_bytes, device)
                     losses["roles"].append(value)
+                    epoch_losses["roles"].append(value)
                 if symbols_optimizer is not None and data:
                     value = _symbol_step(torch, functional, symbols, symbols_optimizer, data,
                                          symbol_targets, language, args.sequence_bytes, device)
                     losses["symbols"].append(value)
+                    epoch_losses["symbols"].append(value)
                 if causal_optimizer is not None:
                     value = _completion_step(torch, functional, causal, causal_optimizer, data,
                                              language, args.sequence_bytes, device)
                     losses["completion"].append(value)
+                    epoch_losses["completion"].append(value)
                 ledger.record(
                     source,
                     "USED",
@@ -737,7 +742,21 @@ def train_sources(args) -> dict:
                                                         for item in validation_history], args)
                     if should_stop:
                         stop_reason = reason
-                        break
+            if getattr(args, "progress", True):
+                progress = {
+                    "event": "epoch_complete",
+                    "epoch": epoch + 1,
+                    "epochsRequested": args.epochs,
+                    "losses": {
+                        task: (sum(values) / len(values) if values else None)
+                        for task, values in epoch_losses.items() if task in tasks
+                    },
+                    "validation": validation_history[-1]["metrics"] if validation_history else None,
+                    "stopReason": stop_reason,
+                }
+                print(json.dumps(progress, separators=(",", ":")), file=sys.stderr, flush=True)
+            if stop_reason:
+                break
     if source_count == 0:
         raise ValueError("no source was used; check licenseId and the source manifest")
 
