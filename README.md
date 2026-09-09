@@ -2,6 +2,8 @@
 
 `syntaxlm` is a tiny, dependency-free syntax-highlighting model. It reads source code, tokenizes it, and predicts a highlighting class for each token. The model is a compact averaged perceptron, so it trains in seconds on a laptop and produces a small JSON model.
 
+The Python side is the trainer/exporter only. The Kotlin side does not invoke Python or import Python code: it contains a standalone tokenizer/scorer and consumes only the exported `syntaxlm.matrix.bin` file.
+
 This is deliberately a first experiment, not a replacement for a full parser. The useful research question is whether a small learned model can recover enough context to make highlighting feel natural, while remaining cheap enough to run in an editor.
 
 ## Quick start
@@ -11,6 +13,8 @@ python3 syntaxlm.py train --output syntaxlm.json
 printf 'def greet(name):\n    return "hello " + name\n' \
   | python3 syntaxlm.py highlight --language python --model syntaxlm.json
 ```
+
+The CLI has no external Python dependencies; `requirements.txt` is intentionally empty apart from an explanatory comment.
 
 The default output is JSON spans:
 
@@ -40,7 +44,7 @@ val provider = SyntaxHighlightProvider(context.assets.open("syntaxlm.matrix.bin"
 val spans = provider.highlight(source, "kotlin")
 ```
 
-The binary is `SYLM` version 1: a UTF-8 feature vocabulary followed by one little-endian float32 row per feature, with columns in this fixed order: `plain`, `keyword`, `name`, `function`, `type`, `builtin`, `string`, `number`, `comment`, `operator`, `punctuation`, `decorator`.
+The binary is `SYLM` version 1: a UTF-8 feature vocabulary followed by one little-endian float32 row per feature, with columns in this fixed order: `plain`, `keyword`, `name`, `function`, `type`, `builtin`, `string`, `number`, `comment`, `operator`, `punctuation`, `decorator`. The matrix contains model weights and feature names; the Kotlin runtime implements the matching feature extraction locally.
 
 ## Training on annotations
 
