@@ -9,6 +9,7 @@ from training.annotations import load_annotations, utf16_range_to_bytes
 from training.streaming_sources import SourceLedger, iter_sources
 from training.sylm1_trainer import train_sources
 from training.syl2_trainer import COMPLETION_VOCABULARY, EOS, _should_stop, _supervision_for_source
+from training.teachers import PythonAstTeacher, TeacherContext, validate_annotation_result
 
 
 class TrainingPipelineTests(unittest.TestCase):
@@ -72,6 +73,15 @@ class TrainingPipelineTests(unittest.TestCase):
     def test_completion_head_can_emit_eos(self):
         self.assertGreater(EOS, 0)
         self.assertGreater(COMPLETION_VOCABULARY, EOS)
+
+    def test_python_teacher_returns_valid_source_free_annotations(self):
+        source = "import os\nclass Box:\n    def get(self):\n        return os.getcwd()\n"
+        result = PythonAstTeacher().annotate(source, TeacherContext("python", "box.py"))
+        result = validate_annotation_result(result, source)
+        self.assertTrue(result["constructs"])
+        self.assertTrue(result["definitions"])
+        self.assertNotIn("source", result)
+        self.assertEqual(result["teacher"]["semanticStatus"], "partial")
 
     def test_supervised_annotations_use_utf16_and_produce_links(self):
         with tempfile.TemporaryDirectory() as directory:

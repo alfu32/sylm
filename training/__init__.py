@@ -1,2 +1,1 @@
-"""Streaming trainers for the legacy SYLM1 and neural SYL2 artifacts."""
-
+"""Streaming trainers and no-retention annotation teachers for SYLM artifacts."""

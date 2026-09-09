@@ -1,0 +1,23 @@
+{
+  "rust": {
+    "command": ["tools/rust-analyzer-teacher"],
+    "name": "rust-analyzer-scip",
+    "version": "replace-with-pinned-version",
+    "timeoutSeconds": 60,
+    "maxOutputBytes": 8388608
+  },
+  "java": {
+    "command": ["tools/javac-indexer-teacher"],
+    "name": "javac-semantic-indexer",
+    "version": "replace-with-pinned-version",
+    "timeoutSeconds": 60,
+    "maxOutputBytes": 8388608
+  },
+  "javascript": {
+    "command": ["tools/tree-sitter-javascript-teacher"],
+    "name": "tree-sitter-javascript-reviewed",
+    "version": "replace-with-pinned-version",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608
+  }
+}

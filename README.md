@@ -12,6 +12,7 @@ Implemented today:
 - Kotlin `SYLM` v1 provider/runner: consumes only the exported matrix binary;
 - bounded streaming source acquisition: reads one source at a time, uses it in memory, writes a metadata-only ledger;
 - multilingual language registry for the TIOBE top-40 target set plus `unknown`;
+- Tree-sitter grammar prefetch and coverage report for the target registry;
 - first SYL2 neural trainer/exporter:
   - completion model trained self-supervised from source bytes;
   - token-role model trained from gold annotations when supplied, otherwise weak bootstrap labels;
@@ -54,6 +55,10 @@ python3 -m pip install -r requirements.txt
 ```
 
 `requirements.txt` currently contains `torch` and `numpy` for SYL2. The legacy path remains standard-library only.
+
+For parser teachers, the environment also includes `tree-sitter` and
+`tree-sitter-language-pack`. Prefetched grammars are stored separately in the
+project-local `.treesitter-cache`; they are parser assets, not training source.
 
 ## Legacy SYLM1 Quick Start
 
@@ -156,6 +161,55 @@ used; otherwise their metadata remains `WEAKLY_SUPERVISED` or `PARTIAL`.
 
 For a source-only annotation manifest, omit `--manifest`; its source metadata is
 used as the acquisition manifest. A license ID is still required by default.
+
+## Parser and Semantic Teachers
+
+Generate annotations through the no-retention teacher runner:
+
+```bash
+python3 -m training.annotate_stream --manifest sources.jsonl \
+  --teacher-config teacher-config.json \
+  --output annotations.jsonl --ledger teacher-source-use.jsonl
+```
+
+The built-in `python-ast` teacher covers Python lexical spans, classes,
+functions, imports, exception/resource constructs, comprehensions, lambdas,
+definitions, and partial local usages. Its semantic result is explicitly
+marked `partial`; it is not a replacement for a compiler/indexer.
+
+External teachers receive one JSON request on stdin:
+
+```json
+{"language":"rust","sourceId":"src/lib.rs","uri":"...","contentSha256":"...","source":"..."}
+```
+
+They must return only annotation JSON (`roleSpans`, `definitions`, `usages`,
+`constructs`, `relations`, and `teacher`) on stdout. They must not return source
+payloads. This protocol can wrap Tree-sitter for syntax/construct regions,
+compiler frontends for types, imports, inheritance and overrides, and SCIP or
+language-native indexers for definitions, calls, references, aliases and
+cross-file links. Commands and versions are pinned in
+[teacher-config.example.json](teacher-config.example.json). The Python runner
+uses stdin/stdout and bounded output, so no checkout or parser workspace is
+required on disk.
+
+A language is skipped when no authoritative teacher is configured. Parser-only
+results may train syntax heads, but semantic model status remains partial until
+definition/link annotations are supplied by a compiler or indexer teacher.
+
+Prefetch the target grammar set and write its exact/fallback/unsupported
+coverage report:
+
+```bash
+./.venv/bin/python -m training.prefetch_grammars \
+  --cache-dir .treesitter-cache --report grammar-coverage.json
+```
+
+The current prefetch retrieved 33 distinct grammars. `scratch`, `gml`, and
+`abap` need dedicated grammars or compiler-specific teachers; `unknown` is an
+intentional abstention class. Family/dialect fallbacks are recorded in
+[grammar-coverage.json](grammar-coverage.json) and are not counted as exact
+language support.
 
 ## Early Stopping
 

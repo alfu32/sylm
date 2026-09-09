@@ -1,0 +1,366 @@
+{
+  "pack": "tree-sitter-language-pack",
+  "cacheDir": ".treesitter-cache",
+  "languages": {
+    "python": {
+      "candidates": [
+        "python"
+      ],
+      "coverage": "exact",
+      "selected": "python",
+      "downloaded": true
+    },
+    "c": {
+      "candidates": [
+        "c"
+      ],
+      "coverage": "exact",
+      "selected": "c",
+      "downloaded": true
+    },
+    "cpp": {
+      "candidates": [
+        "cpp"
+      ],
+      "coverage": "exact",
+      "selected": "cpp",
+      "downloaded": true
+    },
+    "java": {
+      "candidates": [
+        "java"
+      ],
+      "coverage": "exact",
+      "selected": "java",
+      "downloaded": true
+    },
+    "csharp": {
+      "candidates": [
+        "csharp"
+      ],
+      "coverage": "exact",
+      "selected": "csharp",
+      "downloaded": true
+    },
+    "javascript": {
+      "candidates": [
+        "javascript"
+      ],
+      "coverage": "exact",
+      "selected": "javascript",
+      "downloaded": true
+    },
+    "visual-basic": {
+      "candidates": [
+        "vb"
+      ],
+      "coverage": "exact",
+      "selected": "vb",
+      "downloaded": true
+    },
+    "sql": {
+      "candidates": [
+        "sql"
+      ],
+      "coverage": "exact",
+      "selected": "sql",
+      "downloaded": true
+    },
+    "r": {
+      "candidates": [
+        "r"
+      ],
+      "coverage": "exact",
+      "selected": "r",
+      "downloaded": true
+    },
+    "rust": {
+      "candidates": [
+        "rust"
+      ],
+      "coverage": "exact",
+      "selected": "rust",
+      "downloaded": true
+    },
+    "fortran": {
+      "candidates": [
+        "fortran"
+      ],
+      "coverage": "exact",
+      "selected": "fortran",
+      "downloaded": true
+    },
+    "go": {
+      "candidates": [
+        "go"
+      ],
+      "coverage": "exact",
+      "selected": "go",
+      "downloaded": true
+    },
+    "delphi": {
+      "candidates": [
+        "pascal"
+      ],
+      "coverage": "fallback",
+      "selected": "pascal",
+      "downloaded": true
+    },
+    "php": {
+      "candidates": [
+        "php"
+      ],
+      "coverage": "exact",
+      "selected": "php",
+      "downloaded": true
+    },
+    "scratch": {
+      "candidates": [],
+      "coverage": "unsupported",
+      "selected": null
+    },
+    "assembly": {
+      "candidates": [
+        "asm",
+        "x86asm",
+        "nasm"
+      ],
+      "coverage": "fallback",
+      "selected": "asm",
+      "downloaded": true
+    },
+    "ada": {
+      "candidates": [
+        "ada"
+      ],
+      "coverage": "exact",
+      "selected": "ada",
+      "downloaded": true
+    },
+    "swift": {
+      "candidates": [
+        "swift"
+      ],
+      "coverage": "exact",
+      "selected": "swift",
+      "downloaded": true
+    },
+    "objective-c": {
+      "candidates": [
+        "objc"
+      ],
+      "coverage": "exact",
+      "selected": "objc",
+      "downloaded": true
+    },
+    "cobol": {
+      "candidates": [
+        "cobol"
+      ],
+      "coverage": "exact",
+      "selected": "cobol",
+      "downloaded": true
+    },
+    "julia": {
+      "candidates": [
+        "julia"
+      ],
+      "coverage": "exact",
+      "selected": "julia",
+      "downloaded": true
+    },
+    "ruby": {
+      "candidates": [
+        "ruby"
+      ],
+      "coverage": "exact",
+      "selected": "ruby",
+      "downloaded": true
+    },
+    "perl": {
+      "candidates": [
+        "perl"
+      ],
+      "coverage": "exact",
+      "selected": "perl",
+      "downloaded": true
+    },
+    "sas": {
+      "candidates": [
+        "sas"
+      ],
+      "coverage": "exact",
+      "selected": "sas",
+      "downloaded": true
+    },
+    "classic-visual-basic": {
+      "candidates": [
+        "vb"
+      ],
+      "coverage": "fallback",
+      "selected": "vb",
+      "downloaded": true
+    },
+    "kotlin": {
+      "candidates": [
+        "kotlin"
+      ],
+      "coverage": "exact",
+      "selected": "kotlin",
+      "downloaded": true
+    },
+    "matlab": {
+      "candidates": [
+        "matlab"
+      ],
+      "coverage": "exact",
+      "selected": "matlab",
+      "downloaded": true
+    },
+    "caml": {
+      "candidates": [
+        "ocaml"
+      ],
+      "coverage": "fallback",
+      "selected": "ocaml",
+      "downloaded": true
+    },
+    "prolog": {
+      "candidates": [
+        "prolog"
+      ],
+      "coverage": "exact",
+      "selected": "prolog",
+      "downloaded": true
+    },
+    "gml": {
+      "candidates": [],
+      "coverage": "unsupported",
+      "selected": null
+    },
+    "lua": {
+      "candidates": [
+        "lua"
+      ],
+      "coverage": "exact",
+      "selected": "lua",
+      "downloaded": true
+    },
+    "powershell": {
+      "candidates": [
+        "powershell"
+      ],
+      "coverage": "exact",
+      "selected": "powershell",
+      "downloaded": true
+    },
+    "d": {
+      "candidates": [
+        "d"
+      ],
+      "coverage": "exact",
+      "selected": "d",
+      "downloaded": true
+    },
+    "plsql": {
+      "candidates": [
+        "sql",
+        "postgres"
+      ],
+      "coverage": "fallback",
+      "selected": "sql",
+      "downloaded": true
+    },
+    "abap": {
+      "candidates": [],
+      "coverage": "unsupported",
+      "selected": null
+    },
+    "transact-sql": {
+      "candidates": [
+        "tsql"
+      ],
+      "coverage": "exact",
+      "selected": "tsql",
+      "downloaded": true
+    },
+    "vbscript": {
+      "candidates": [
+        "vb"
+      ],
+      "coverage": "fallback",
+      "selected": "vb",
+      "downloaded": true
+    },
+    "ocaml": {
+      "candidates": [
+        "ocaml"
+      ],
+      "coverage": "exact",
+      "selected": "ocaml",
+      "downloaded": true
+    },
+    "typescript": {
+      "candidates": [
+        "typescript"
+      ],
+      "coverage": "exact",
+      "selected": "typescript",
+      "downloaded": true
+    },
+    "zig": {
+      "candidates": [
+        "zig"
+      ],
+      "coverage": "exact",
+      "selected": "zig",
+      "downloaded": true
+    },
+    "unknown": {
+      "candidates": [],
+      "coverage": "unsupported",
+      "selected": null
+    }
+  },
+  "downloadedGrammars": [
+    "ada",
+    "asm",
+    "c",
+    "cobol",
+    "cpp",
+    "csharp",
+    "d",
+    "fortran",
+    "go",
+    "java",
+    "javascript",
+    "julia",
+    "kotlin",
+    "lua",
+    "matlab",
+    "objc",
+    "ocaml",
+    "pascal",
+    "perl",
+    "php",
+    "powershell",
+    "prolog",
+    "python",
+    "r",
+    "ruby",
+    "rust",
+    "sas",
+    "sql",
+    "swift",
+    "tsql",
+    "typescript",
+    "vb",
+    "zig"
+  ],
+  "unsupportedProjectLanguages": [
+    "scratch",
+    "gml",
+    "abap",
+    "unknown"
+  ]
+}
