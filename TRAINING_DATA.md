@@ -99,6 +99,15 @@ For partial or ambiguous labels, mask losses or use compatible-target/set losses
 
 ## Model 1 annotations
 
+The implemented SYL2 trainer accepts one JSON object per source in an
+annotation-manifest JSONL file. It joins records by `uri` or `sourceId`, then
+expects `roleSpans` with inclusive/exclusive UTF-16 `start`/`end` coordinates
+and a shared `role` (or `kind`). `contentSha256` is optional but recommended;
+when present, the trainer refuses to apply the record to a changed source.
+Uncovered bytes are masked for the supervised role loss. The current bootstrap
+export supports lexical roles and same-window identifier links; nested region
+and language-region labels remain additional schema/training work.
+
 Required targets:
 
 - Complete lexical ranges and roles, including whole strings and single-/multiline comments.
@@ -115,6 +124,16 @@ Examples must cover both positive regions and confusing negatives: arrays versus
 A failed parser region is unknown supervision. Keep useful raw code for other losses and mask unreliable labels locally. Missing a role category in a language can mean not applicable, rather than zero-quality training.
 
 ## Model 2 annotations
+
+The implemented annotation record uses `definitions` with a stable per-source
+`id`, `nameRange`, and optional `kind`, plus `usages` with a range,
+`definitionId`, `occurrence`, `kind`, and optional `status`. The trainer
+converts these coordinates to UTF-8 byte positions, trains occurrence/kind
+heads, and applies candidate cross-entropy to resolved definitions that are in
+the same bounded encoder window. Resolved links outside that window are
+counted as unevaluated coverage; they are never mislabeled as unresolved.
+This is a supervised bootstrap for local navigation, not yet full project
+semantic training.
 
 Required targets:
 

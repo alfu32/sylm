@@ -5,9 +5,10 @@ from pathlib import Path
 
 from syntaxlm import SourceSpec
 from training.registry import LANGUAGES, REGISTRY_HASH, language_index
+from training.annotations import load_annotations, utf16_range_to_bytes
 from training.streaming_sources import SourceLedger, iter_sources
 from training.sylm1_trainer import train_sources
-from training.syl2_trainer import _should_stop
+from training.syl2_trainer import _should_stop, _supervision_for_source
 
 
 class TrainingPipelineTests(unittest.TestCase):
@@ -67,6 +68,32 @@ class TrainingPipelineTests(unittest.TestCase):
         self.assertEqual(_should_stop([0.61, 0.62001, 0.62002, 0.62003], Args()), (False, None))
         self.assertEqual(_should_stop([0.81, 0.81001, 0.81002, 0.81003], Args()), (True, "precision_plateau"))
         self.assertEqual(_should_stop([0.99], Args()), (True, "target_precision"))
+
+    def test_supervised_annotations_use_utf16_and_produce_links(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source_path = root / "sample.py"
+            source = "# 😀\ndef answer():\n    return answer\n"
+            source_path.write_text(source, encoding="utf-8")
+            manifest = root / "annotations.jsonl"
+            manifest.write_text(json.dumps({
+                "uri": str(source_path),
+                "language": "python",
+                "licenseId": "MIT",
+                "teacher": {"name": "checked-parser", "version": "v1"},
+                "roleSpans": [{"start": 0, "end": 4, "role": "comment"}],
+                "definitions": [{"id": "d1", "nameRange": {"start": 9, "end": 15}, "kind": "function"}],
+                "usages": [{"start": 29, "end": 35, "definitionId": "d1", "kind": "function"}],
+            }) + "\n", encoding="utf-8")
+            records = load_annotations(manifest)
+            self.assertEqual(utf16_range_to_bytes(source, 0, 4), (0, 6))
+            role, symbols, role_coverage, link_count, teacher = _supervision_for_source(
+                source, "python", records[0]
+            )
+            self.assertEqual(role_coverage, 6)
+            self.assertEqual(link_count, 1)
+            self.assertEqual(teacher, "v1")
+            self.assertEqual(symbols[2][0]["definitionId"], "d1")
 
 
 if __name__ == "__main__":

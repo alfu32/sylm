@@ -2,7 +2,7 @@
 
 Small local language models for source-code understanding, designed so a Kotlin editor client can consume exported binary artifacts without invoking Python.
 
-The project is currently in bootstrap state. It has a working legacy SYLM1 syntax highlighter with a Kotlin matrix runner, plus first-stage streaming trainers for SYLM1 and SYL2 artifacts. The full three-model architecture is specified, but SYL2 Kotlin inference and semantic definition-link supervision are not complete yet.
+The project is currently in bootstrap state. It has a working legacy SYLM1 syntax highlighter with a Kotlin matrix runner, plus streaming trainers for SYLM1 and SYL2 artifacts. The SYL2 Python trainer now accepts gold role and local definition-link annotations, but SYL2 Kotlin inference and broad semantic coverage are not complete yet.
 
 ## Current Scope
 
@@ -14,15 +14,15 @@ Implemented today:
 - multilingual language registry for the TIOBE top-40 target set plus `unknown`;
 - first SYL2 neural trainer/exporter:
   - completion model trained self-supervised from source bytes;
-  - token-role model trained from weak bootstrap labels;
-  - identifier-occurrence model trained from weak bootstrap labels;
+  - token-role model trained from gold annotations when supplied, otherwise weak bootstrap labels;
+  - identifier occurrence/kind and same-window definition-link heads trained from gold annotations when supplied;
   - SYL2 tensor container writer;
   - validation precision history and early stopping.
 
 Not complete yet:
 
 - Kotlin SYL2 neural runtime;
-- compiler/indexer teacher pipeline for true definition-to-usage links;
+- compiler/indexer teacher adapters and broad cross-file definition-to-usage coverage;
 - validated 99% precision across languages/tasks;
 - automatic public-source discovery/crawling with license policy beyond manifest-driven raw file acquisition;
 - semantic navigation quality for imports, overloads, members, shadowing, and cross-file symbols.
@@ -102,7 +102,7 @@ python3 -m training.sylm1_trainer --manifest sources.jsonl \
   --output sylm1.matrix.bin --ledger source-use-sylm1.jsonl
 ```
 
-Train the first SYL2 bootstrap artifacts:
+Train the first SYL2 artifacts (self-/weakly supervised when no annotation manifest is supplied):
 
 ```bash
 python3 -m training.syl2_trainer --manifest sources.jsonl \
@@ -114,6 +114,48 @@ SYL2 outputs:
 - `syl2/next-word.model.bin`: self-supervised causal byte model;
 - `syl2/token-role.model.bin`: weakly supervised token-role model;
 - `syl2/identifier-relation.model.bin`: partial identifier occurrence model; link head is exported but untrained.
+
+## Supervised Training
+
+Gold supervision is supplied separately from source acquisition. The annotation
+manifest contains source identity, UTF-16 ranges, labels, and teacher
+provenance; it does not contain source text. The trainer reacquires the source
+through the normal bounded stream, validates the coordinates against that
+source, trains, and discards the source.
+
+One JSONL annotation record can look like this:
+
+```json
+{"uri":"/data/project/main.py","language":"python","licenseId":"MIT","split":"train","teacher":{"name":"scip-tree-sitter","version":"2026.09"},"roleSpans":[{"start":0,"end":3,"role":"keyword"},{"start":4,"end":7,"role":"identifier"}],"definitions":[{"id":"d1","nameRange":{"start":4,"end":7},"kind":"function"}],"usages":[{"start":35,"end":38,"definitionId":"d1","kind":"function"}]}
+```
+
+`start` is inclusive and `end` exclusive in UTF-16 units. `roleSpans` may use
+the shared roles (`keyword`, `identifier`, `punctuation`, `string_literal`,
+`number_literal`, `comment`, `array_literal`, and `object_literal`). Definition
+IDs are local to one source record. A usage whose target is genuinely external
+or unresolved may omit `definitionId` and set an explicit `status`.
+
+Run supervised training by pairing the source manifest with the annotation
+manifest:
+
+```bash
+python3 -m training.syl2_trainer --manifest sources.jsonl \
+  --annotation-manifest annotations.jsonl --output-dir syl2-supervised \
+  --ledger source-use-syl2-supervised.jsonl --tasks roles symbols \
+  --epochs 100 --target-precision 0.99 --plateau-precision-gate 0.80 \
+  --min-epochs 5 --early-stop-patience 3
+```
+
+The role model receives masked gold bytes, so unlabeled bytes do not become
+false negatives. The identifier model trains occurrence and symbol-kind heads,
+plus the dynamic usage-to-definition candidate link head for definitions in the
+same training window. Cross-window links are reported as unevaluated coverage,
+not as null links. The completion model remains source-byte self-supervised.
+Artifacts are marked `SUPERVISED` only when matching gold labels were actually
+used; otherwise their metadata remains `WEAKLY_SUPERVISED` or `PARTIAL`.
+
+For a source-only annotation manifest, omit `--manifest`; its source metadata is
+used as the acquisition manifest. A license ID is still required by default.
 
 ## Early Stopping
 
