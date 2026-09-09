@@ -37,7 +37,9 @@ BYTE_VOCABULARY = 259
 BOS = 256
 EOS = 257
 PAD = 258
-COMPLETION_VOCABULARY = 257
+# 256 byte values plus BOS/EOS are input IDs; completion predicts bytes plus
+# EOS. BOS is never a completion target, so the output IDs are 0..257.
+COMPLETION_VOCABULARY = 258
 ROLE_LABELS = (
     "plain", "keyword", "identifier", "string_literal", "number_literal",
     "comment", "operator", "punctuation", "array_literal", "object_literal",

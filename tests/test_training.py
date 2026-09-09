@@ -8,7 +8,7 @@ from training.registry import LANGUAGES, REGISTRY_HASH, language_index
 from training.annotations import load_annotations, utf16_range_to_bytes
 from training.streaming_sources import SourceLedger, iter_sources
 from training.sylm1_trainer import train_sources
-from training.syl2_trainer import _should_stop, _supervision_for_source
+from training.syl2_trainer import COMPLETION_VOCABULARY, EOS, _should_stop, _supervision_for_source
 
 
 class TrainingPipelineTests(unittest.TestCase):
@@ -68,6 +68,10 @@ class TrainingPipelineTests(unittest.TestCase):
         self.assertEqual(_should_stop([0.61, 0.62001, 0.62002, 0.62003], Args()), (False, None))
         self.assertEqual(_should_stop([0.81, 0.81001, 0.81002, 0.81003], Args()), (True, "precision_plateau"))
         self.assertEqual(_should_stop([0.99], Args()), (True, "target_precision"))
+
+    def test_completion_head_can_emit_eos(self):
+        self.assertGreater(EOS, 0)
+        self.assertGreater(COMPLETION_VOCABULARY, EOS)
 
     def test_supervised_annotations_use_utf16_and_produce_links(self):
         with tempfile.TemporaryDirectory() as directory:
