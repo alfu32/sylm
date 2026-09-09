@@ -4,6 +4,8 @@
 
 The Python side is the trainer/exporter only. The Kotlin side does not invoke Python or import Python code: it contains a standalone tokenizer/scorer and consumes only the exported `syntaxlm.matrix.bin` file.
 
+The planned three-model design is documented in [MODEL_ARCHITECTURE.md](MODEL_ARCHITECTURE.md). The current implementation is the model-1 linear prototype; models 2 and 3 are specified there and require separate artifacts.
+
 This is deliberately a first experiment, not a replacement for a full parser. The useful research question is whether a small learned model can recover enough context to make highlighting feel natural, while remaining cheap enough to run in an editor.
 
 ## Quick start
