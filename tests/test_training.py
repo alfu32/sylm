@@ -14,9 +14,12 @@ from training.teachers import PythonAstTeacher, TeacherContext, validate_annotat
 
 class TrainingPipelineTests(unittest.TestCase):
     def test_registry_is_stable_and_contains_unknown(self):
-        self.assertEqual(len(LANGUAGES), 41)
+        self.assertEqual(len(LANGUAGES), 47)
         self.assertNotEqual(REGISTRY_HASH, "")
         self.assertEqual(language_index("typescript"), language_index("ts"))
+        self.assertNotEqual(language_index("jsx"), language_index("javascript"))
+        self.assertNotEqual(language_index("tsx"), language_index("typescript"))
+        self.assertEqual(LANGUAGES[language_index("svelte")], "svelte")
         self.assertEqual(LANGUAGES[language_index("not-a-language")], "unknown")
 
     def test_shared_stream_ledger_contains_no_source_payload(self):

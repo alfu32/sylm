@@ -86,8 +86,14 @@ class Span:
 
 def normalize_language(language: str) -> str:
     language = language.lower()
-    if language in {"js", "jsx", "javascript", "ts", "tsx", "typescript"}:
+    if language in {"js", "javascript"}:
         return "javascript"
+    if language in {"jsx"}:
+        return "javascript"
+    if language in {"ts", "typescript"}:
+        return "typescript"
+    if language in {"tsx"}:
+        return "typescript"
     if language in {"py", "python3"}:
         return "python"
     if language in {"jsonc"}:
@@ -386,13 +392,15 @@ class SourceSpec:
 
 
 LANGUAGE_EXTENSIONS = {
-    ".py": "python", ".pyw": "python", ".js": "javascript", ".jsx": "javascript",
-    ".ts": "typescript", ".tsx": "typescript", ".json": "json", ".jsonc": "json",
+    ".py": "python", ".pyw": "python", ".js": "javascript",
+    ".ts": "typescript", ".json": "json", ".jsonc": "json",
     ".kt": "kotlin", ".kts": "kotlin", ".java": "java", ".c": "c", ".h": "c",
     ".cc": "cpp", ".cpp": "cpp", ".cxx": "cpp", ".cs": "csharp", ".go": "go",
     ".rs": "rust", ".rb": "ruby", ".php": "php", ".swift": "swift",
     ".scala": "scala", ".sql": "sql", ".lua": "lua", ".sh": "shell",
     ".ps1": "powershell", ".r": "r", ".R": "r", ".m": "objective-c",
+    ".html": "html", ".htm": "html", ".xml": "xml", ".jsx": "jsx",
+    ".tsx": "tsx", ".svelte": "svelte",
 }
 
 

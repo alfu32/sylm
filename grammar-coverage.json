@@ -320,6 +320,56 @@
       "candidates": [],
       "coverage": "unsupported",
       "selected": null
+    },
+    "json": {
+      "candidates": [
+        "json"
+      ],
+      "coverage": "exact",
+      "selected": "json",
+      "downloaded": true
+    },
+    "xml": {
+      "candidates": [
+        "xml"
+      ],
+      "coverage": "exact",
+      "selected": "xml",
+      "downloaded": true
+    },
+    "html": {
+      "candidates": [
+        "html"
+      ],
+      "coverage": "exact",
+      "selected": "html",
+      "downloaded": true
+    },
+    "jsx": {
+      "candidates": [
+        "jsx",
+        "javascript"
+      ],
+      "coverage": "fallback",
+      "selected": "javascript",
+      "downloaded": true
+    },
+    "tsx": {
+      "candidates": [
+        "tsx",
+        "typescript"
+      ],
+      "coverage": "fallback",
+      "selected": "tsx",
+      "downloaded": true
+    },
+    "svelte": {
+      "candidates": [
+        "svelte"
+      ],
+      "coverage": "exact",
+      "selected": "svelte",
+      "downloaded": true
     }
   },
   "downloadedGrammars": [
@@ -332,8 +382,10 @@
     "d",
     "fortran",
     "go",
+    "html",
     "java",
     "javascript",
+    "json",
     "julia",
     "kotlin",
     "lua",
@@ -351,10 +403,13 @@
     "rust",
     "sas",
     "sql",
+    "svelte",
     "swift",
     "tsql",
+    "tsx",
     "typescript",
     "vb",
+    "xml",
     "zig"
   ],
   "unsupportedProjectLanguages": [

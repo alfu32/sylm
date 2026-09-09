@@ -1,0 +1,16 @@
+{"language":"python","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.py","split":"train","providerId":"authorized-repository"}
+{"language":"c","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.c","split":"train","providerId":"authorized-repository"}
+{"language":"cpp","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.cpp","split":"train","providerId":"authorized-repository"}
+{"language":"java","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.java","split":"train","providerId":"authorized-repository"}
+{"language":"kotlin","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.kt","split":"train","providerId":"authorized-repository"}
+{"language":"go","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.go","split":"train","providerId":"authorized-repository"}
+{"language":"rust","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.rs","split":"train","providerId":"authorized-repository"}
+{"language":"javascript","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.js","split":"train","providerId":"authorized-repository"}
+{"language":"typescript","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.ts","split":"train","providerId":"authorized-repository"}
+{"language":"csharp","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.cs","split":"train","providerId":"authorized-repository"}
+{"language":"ruby","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.rb","split":"train","providerId":"authorized-repository"}
+{"language":"php","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.php","split":"train","providerId":"authorized-repository"}
+{"language":"perl","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.pl","split":"train","providerId":"authorized-repository"}
+{"language":"lua","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.lua","split":"train","providerId":"authorized-repository"}
+{"language":"powershell","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.ps1","split":"train","providerId":"authorized-repository"}
+{"language":"zig","uri":"REPLACE_WITH_AUTHORIZED_SOURCE_URI","licenseId":"REPLACE_WITH_LICENSE","sourceId":"project/path.zig","split":"train","providerId":"authorized-repository"}

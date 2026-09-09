@@ -576,8 +576,9 @@ def _evaluate_sources(args, torch, functional, causal, roles, symbols, validatio
     }
     with SourceLedger(args.ledger) as ledger:
         for source in iter_sources(validation_specs, args.max_bytes, ledger, args.license_policy):
-            language_name = normalize_language(source.spec.language or "text")
-            language = language_index(language_name)
+            source_language = source.spec.language or "text"
+            language_name = normalize_language(source_language)
+            language = language_index(source_language)
             data = _byte_ids(source.text)
             annotation = annotation_for(record_index, source.spec)
             if annotation is not None and annotation.content_sha256 and annotation.content_sha256 != source.content_sha256:
@@ -684,8 +685,9 @@ def train_sources(args) -> dict:
         for epoch in range(args.epochs):
             epoch_losses = {task: [] for task in losses}
             for source in iter_sources(training_specs, args.max_bytes, ledger, args.license_policy):
-                language_name = normalize_language(source.spec.language or "text")
-                language = language_index(language_name)
+                source_language = source.spec.language or "text"
+                language_name = normalize_language(source_language)
+                language = language_index(source_language)
                 data = _byte_ids(source.text)
                 annotation = annotation_for(args.annotation_index, source.spec)
                 if annotation is not None and annotation.content_sha256 and annotation.content_sha256 != source.content_sha256:
@@ -730,7 +732,7 @@ def train_sources(args) -> dict:
                     },
                 )
                 source_count += 1
-                language_counts[language_name] = language_counts.get(language_name, 0) + 1
+                language_counts[source_language] = language_counts.get(source_language, 0) + 1
                 del data, source
             if validation_specs:
                 metrics = _evaluate_sources(args, torch, functional, causal, roles, symbols,

@@ -14,11 +14,11 @@ LANGUAGES = (
     "perl", "sas", "classic-visual-basic", "kotlin", "matlab", "caml",
     "prolog", "gml", "lua", "powershell", "d", "plsql", "abap",
     "transact-sql", "vbscript", "ocaml", "typescript", "zig",
-    "unknown",
+    "unknown", "json", "xml", "html", "jsx", "tsx", "svelte",
 )
 
 LANGUAGE_TO_INDEX = {language: index for index, language in enumerate(LANGUAGES)}
-REGISTRY_VERSION = "tiobe-top40-2026-09"
+REGISTRY_VERSION = "tiobe-top40-plus-supplemental-2026-09"
 REGISTRY_HASH = hashlib.sha256(json.dumps(
     {"version": REGISTRY_VERSION, "languages": LANGUAGES},
     separators=(",", ":"),
@@ -35,4 +35,3 @@ def language_index(language: str | None) -> int:
         "objectivec": "objective-c", "pl/sql": "plsql", "t-sql": "transact-sql",
     }
     return LANGUAGE_TO_INDEX.get(aliases.get(value, value), LANGUAGE_TO_INDEX["unknown"])
-

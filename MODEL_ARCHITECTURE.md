@@ -51,7 +51,7 @@ Use a frozen **September 2026** target snapshot, consulted **2026-09-09**. TIOBE
 | 21–30 | Julia, Ruby, Perl, SAS, Classic Visual Basic, Kotlin, MATLAB, Caml, Prolog, GML |
 | 31–40 | Lua, PowerShell, D, PL/SQL, ABAP, Transact-SQL, VBScript, OCaml, TypeScript, Zig |
 
-The engineering target is data collection for every applicable textual entry, with a broad-release goal of at least 32 of these 40 entries passing the declared per-task gates. This is a planned acceptance target, not current support. Publish the exact numerator/denominator and exclusions; do not count a language as link-capable merely because its raw files were used for completion training.
+The engineering target is data collection for every applicable textual entry, with a broad-release goal of at least 32 of the 40 TIOBE entries passing the declared per-task gates. JSON, XML, HTML, JSX, TSX, and Svelte are tracked as supplemental host/markup entries and are reported separately from the TIOBE denominator. This is a planned acceptance target, not current support. Publish the exact numerator/denominator and exclusions; do not count a language as link-capable merely because its raw files were used for completion training.
 
 Maintain a stable registry with canonical ID, display name, family, dialect IDs, aliases, TIOBE snapshot entries, input representation, per-task annotation availability, and measured coverage. IDs are never derived from current rank. Registry changes require a new hash and artifact metadata.
 

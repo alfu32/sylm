@@ -20,6 +20,8 @@ TREE_SITTER_LANGUAGE_MAP = {
     "powershell": ("powershell",), "d": ("d",), "plsql": ("sql", "postgres"),
     "abap": (), "transact-sql": ("tsql",), "vbscript": ("vb",), "ocaml": ("ocaml",),
     "typescript": ("typescript",), "zig": ("zig",), "unknown": (),
+    "json": ("json",), "xml": ("xml",), "html": ("html",),
+    "jsx": ("jsx", "javascript"), "tsx": ("tsx", "typescript"), "svelte": ("svelte",),
 }
 
 

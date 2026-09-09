@@ -11,7 +11,7 @@ Implemented today:
 - legacy `SYLM` v1 syntax model: averaged perceptron, dependency-free Python trainer, portable matrix export;
 - Kotlin `SYLM` v1 provider/runner: consumes only the exported matrix binary;
 - bounded streaming source acquisition: reads one source at a time, uses it in memory, writes a metadata-only ledger;
-- multilingual language registry for the TIOBE top-40 target set plus `unknown`;
+- multilingual language registry for the TIOBE top-40 target set, `unknown`, and supplemental JSON/XML/HTML/JSX/TSX/Svelte formats;
 - Tree-sitter grammar prefetch and coverage report for the target registry;
 - first SYL2 neural trainer/exporter:
   - completion model trained self-supervised from source bytes;
@@ -39,6 +39,11 @@ The target system has three local models:
 3. `next-word`: predicts the next word/token from the whole previous code prefix.
 
 The Kotlin client should gather model results, validate ranges, cache document snapshots, and expose editor actions. It should not depend on Python code or offline annotation tools.
+
+JSON, XML, HTML, JSX, TSX, and Svelte are explicit supplemental language
+identities. JSX/TSX reuse JavaScript/TypeScript lexical behavior internally,
+but retain separate language outputs so embedded markup and framework syntax can
+be evaluated independently.
 
 ## Requirements
 

@@ -1,0 +1,520 @@
+{
+  "python": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "python"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "c": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "c"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "cpp": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "cpp"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "java": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "java"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "csharp": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "csharp"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "javascript": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "javascript"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "visual-basic": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "visual-basic"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "sql": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "sql"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "r": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "r"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "rust": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "rust"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "fortran": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "fortran"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "go": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "go"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "delphi": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "delphi"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "php": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "php"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "assembly": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "assembly"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "ada": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "ada"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "swift": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "swift"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "objective-c": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "objective-c"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "cobol": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "cobol"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "julia": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "julia"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "ruby": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "ruby"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "perl": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "perl"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "sas": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "sas"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "classic-visual-basic": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "classic-visual-basic"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "kotlin": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "kotlin"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "matlab": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "matlab"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "caml": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "caml"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "prolog": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "prolog"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "lua": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "lua"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "powershell": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "powershell"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "d": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "d"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "plsql": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "plsql"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "transact-sql": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "transact-sql"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "vbscript": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "vbscript"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "ocaml": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "ocaml"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "typescript": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "typescript"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "zig": {
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "zig"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  }
+}
