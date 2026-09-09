@@ -1,0 +1,73 @@
+import json
+import tempfile
+import unittest
+from pathlib import Path
+
+from syntaxlm import SourceSpec
+from training.registry import LANGUAGES, REGISTRY_HASH, language_index
+from training.streaming_sources import SourceLedger, iter_sources
+from training.sylm1_trainer import train_sources
+from training.syl2_trainer import _should_stop
+
+
+class TrainingPipelineTests(unittest.TestCase):
+    def test_registry_is_stable_and_contains_unknown(self):
+        self.assertEqual(len(LANGUAGES), 41)
+        self.assertNotEqual(REGISTRY_HASH, "")
+        self.assertEqual(language_index("typescript"), language_index("ts"))
+        self.assertEqual(LANGUAGES[language_index("not-a-language")], "unknown")
+
+    def test_shared_stream_ledger_contains_no_source_payload(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source_path = root / "sample.py"
+            source_path.write_text("# secret-source\nvalue = 42\n", encoding="utf-8")
+            ledger_path = root / "ledger.jsonl"
+            with SourceLedger(ledger_path) as ledger:
+                sources = list(iter_sources(
+                    [SourceSpec(str(source_path), language="python", license_id="MIT")],
+                    1024,
+                    ledger,
+                ))
+                self.assertEqual(sources[0].text.splitlines()[-1], "value = 42")
+                ledger.record(sources[0], "USED", labels={"bytes": len(sources[0].raw)})
+                del sources
+            text = ledger_path.read_text(encoding="utf-8")
+            self.assertNotIn("secret-source", text)
+            self.assertIn("contentSha256", text)
+
+    def test_sylm1_module_trainer_exports_legacy_matrix(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source_path = root / "sample.py"
+            source_path.write_text("def answer():\n    return 42\n", encoding="utf-8")
+            result = train_sources(
+                [SourceSpec(str(source_path), language="python", license_id="MIT")],
+                epochs=1,
+                max_bytes=1024,
+                ledger_path=str(root / "ledger.jsonl"),
+                output=str(root / "sylm1.matrix.bin"),
+                output_format="bin",
+                license_policy="require",
+            )
+            self.assertEqual(result["used"], 1)
+            self.assertEqual((root / "sylm1.matrix.bin").read_bytes()[:6], b"SYLM\x01\x00")
+            record = json.loads((root / "ledger.jsonl").read_text(encoding="utf-8"))
+            self.assertEqual(record["status"], "USED")
+
+    def test_syl2_plateau_stop_is_gated_by_precision(self):
+        class Args:
+            target_precision = 0.99
+            plateau_precision_gate = 0.80
+            min_epochs = 3
+            early_stop_patience = 2
+            min_precision_delta = 0.0001
+            curvature_threshold = 0.00001
+
+        self.assertEqual(_should_stop([0.61, 0.62001, 0.62002, 0.62003], Args()), (False, None))
+        self.assertEqual(_should_stop([0.81, 0.81001, 0.81002, 0.81003], Args()), (True, "precision_plateau"))
+        self.assertEqual(_should_stop([0.99], Args()), (True, "target_precision"))
+
+
+if __name__ == "__main__":
+    unittest.main()

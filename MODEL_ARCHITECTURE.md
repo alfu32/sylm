@@ -529,6 +529,7 @@ Model artifacts and nine bootstrap snippets alone do not establish editor qualit
 - The existing Python and Kotlin tokenizers differ: Python uses tokenize for valid Python; Kotlin treats // as a comment regardless of language and has different operator/number boundaries and keyword tables.
 - The old binary is a feature dictionary with dense float32 class rows, not a neural recurrent tensor container.
 - `train-stream` currently supports bounded raw files/HTTP(S) files and the legacy bootstrap labels only. It does not yet stream repository archives/dataset shards through project-level semantic teachers or train the three neural models.
+- `training.sylm1_trainer` and `training.syl2_trainer` now provide the first streaming trainers. The SYL2 role/symbol labels are weak bootstrap labels, completion is self-supervised, and semantic definition/link supervision plus archive/indexer providers are still required for a validated release.
 - Python training annotations currently use codepoint offsets while predictions use UTF-16. The new schemas require explicit UTF-16 conversion and validation.
 - The current ANSI renderer searches for span text; this can select an earlier repeated occurrence. Render by validated coordinates.
 - The prototype has no nested region model, scope/reference model, completion model, document revisions, or cross-runtime golden suite.

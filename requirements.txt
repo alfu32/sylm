@@ -1,2 +1,4 @@
-# syntaxlm's Python CLI uses only the Python standard library.
-# No third-party packages are required.
+# The legacy syntaxlm.py CLI and SYLM1 trainer use only the Python standard library.
+# SYL2 neural training/export requires the following packages.
+numpy>=1.26,<3
+torch>=2.2,<3
