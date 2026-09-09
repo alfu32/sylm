@@ -1,0 +1,163 @@
+{
+  "timestamp": "2026-09-09T19:33:39.070503+00:00",
+  "cpu": "Intel(R) Xeon(R) W-11955M CPU @ 2.60GHz",
+  "platform": "Linux-6.8.0-138-generic-x86_64-with-glibc2.35",
+  "python": "3.10.12",
+  "runtime": "PyTorch CPU float32; NOT Kotlin",
+  "beamWidth": 1,
+  "timing": "warm wall-clock; allocations for input, model load and disk IO excluded",
+  "unit": "one byte; words/identifiers require multiple steps",
+  "prefixInput": "synthetic ASCII code; BOS included",
+  "weights": "seed-17 random initialization",
+  "artifact": null,
+  "results": [
+    {
+      "size": "17m",
+      "embedding": 256,
+      "hidden": 1024,
+      "layers": 3,
+      "parameters": 16913458,
+      "float32WeightMB": 67.653832,
+      "threads": 4,
+      "decodeByte": {
+        "samples": 512,
+        "medianMs": 2.60329750017263,
+        "p95Ms": 3.384720001122332,
+        "meanMs": 2.668365802733774,
+        "maxMs": 4.722863001006772,
+        "bytesPerSecond": 374.76121114109895
+      },
+      "generateBytes": {
+        "8": {
+          "samples": 30,
+          "medianMs": 19.69267649928952,
+          "p95Ms": 21.77374499842699,
+          "meanMs": 19.98121283340879,
+          "maxMs": 22.497584999655373
+        },
+        "16": {
+          "samples": 30,
+          "medianMs": 40.25866749998386,
+          "p95Ms": 45.60078799840994,
+          "meanMs": 40.93157903322814,
+          "maxMs": 45.65068699957919
+        },
+        "32": {
+          "samples": 30,
+          "medianMs": 79.88259600006131,
+          "p95Ms": 83.78764799999772,
+          "meanMs": 80.43518746690097,
+          "maxMs": 86.49061100004474
+        }
+      },
+      "prefixReplayBytes": {
+        "16": {
+          "samples": 30,
+          "medianMs": 10.484293500667263,
+          "p95Ms": 11.603590999584412,
+          "meanMs": 10.620573100216765,
+          "maxMs": 11.70823400025256
+        }
+      }
+    },
+    {
+      "size": "32m",
+      "embedding": 256,
+      "hidden": 1408,
+      "layers": 3,
+      "parameters": 31341106,
+      "float32WeightMB": 125.364424,
+      "threads": 4,
+      "decodeByte": {
+        "samples": 512,
+        "medianMs": 5.198895000830817,
+        "p95Ms": 6.122359998698812,
+        "meanMs": 5.282179339832993,
+        "maxMs": 8.097047000774182,
+        "bytesPerSecond": 189.3157985869554
+      },
+      "generateBytes": {
+        "8": {
+          "samples": 30,
+          "medianMs": 41.43610799928865,
+          "p95Ms": 44.51179600073374,
+          "meanMs": 41.75167303328635,
+          "maxMs": 44.545852000737796
+        },
+        "16": {
+          "samples": 30,
+          "medianMs": 82.36032649983827,
+          "p95Ms": 85.32966100028716,
+          "meanMs": 82.43801316687798,
+          "maxMs": 85.7937810014846
+        },
+        "32": {
+          "samples": 30,
+          "medianMs": 165.60013649996108,
+          "p95Ms": 171.31934899953194,
+          "meanMs": 165.31050280009367,
+          "maxMs": 173.7851710004179
+        }
+      },
+      "prefixReplayBytes": {
+        "16": {
+          "samples": 30,
+          "medianMs": 22.354667000399786,
+          "p95Ms": 26.454019000084372,
+          "meanMs": 22.53672389985392,
+          "maxMs": 26.762279998365557
+        }
+      }
+    },
+    {
+      "size": "65m",
+      "embedding": 256,
+      "hidden": 2048,
+      "layers": 3,
+      "parameters": 65217586,
+      "float32WeightMB": 260.870344,
+      "threads": 4,
+      "decodeByte": {
+        "samples": 512,
+        "medianMs": 11.336798999764142,
+        "p95Ms": 12.868118999904254,
+        "meanMs": 11.405117060551362,
+        "maxMs": 14.428615000724676,
+        "bytesPerSecond": 87.67994179199215
+      },
+      "generateBytes": {
+        "8": {
+          "samples": 30,
+          "medianMs": 84.62116549981147,
+          "p95Ms": 87.72553000017069,
+          "meanMs": 85.04164496650144,
+          "maxMs": 87.85675400031323
+        },
+        "16": {
+          "samples": 30,
+          "medianMs": 169.46830899996712,
+          "p95Ms": 175.90298399954918,
+          "meanMs": 169.90692393331605,
+          "maxMs": 176.58615900108998
+        },
+        "32": {
+          "samples": 30,
+          "medianMs": 344.2340185010835,
+          "p95Ms": 354.35574899929634,
+          "meanMs": 344.4287043334043,
+          "maxMs": 359.848468000564
+        }
+      },
+      "prefixReplayBytes": {
+        "16": {
+          "samples": 30,
+          "medianMs": 102.68354500112764,
+          "p95Ms": 105.83432199928211,
+          "meanMs": 102.39782476674009,
+          "maxMs": 107.95258000143804
+        }
+      }
+    }
+  ],
+  "torchVersion": "2.14.0+cpu"
+}

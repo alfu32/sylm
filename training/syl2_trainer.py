@@ -170,7 +170,10 @@ def _boundary_targets(values: list[int]) -> list[float]:
     return [1.0 if value in b" \t\r\n.,;:()[]{}<>+-=*/!&|" else 0.0 for value in values]
 
 
-def _make_models(seed: int | None = None):
+def _make_models(seed: int | None = None, *, completion_embedding: int = 96,
+                 completion_hidden: int = 192, completion_layers: int = 2):
+    if min(completion_embedding, completion_hidden, completion_layers) < 1:
+        raise ValueError("completion dimensions and layer count must be positive")
     torch, nn, functional = _torch()
     if seed is not None:
         torch.manual_seed(seed)
@@ -179,11 +182,12 @@ def _make_models(seed: int | None = None):
     class CausalByteModel(nn.Module):
         def __init__(self):
             super().__init__()
-            self.embedding = nn.Embedding(BYTE_VOCABULARY, 96, padding_idx=PAD)
-            self.encoder = nn.GRU(96, 192, num_layers=2, batch_first=True)
-            self.byte_head = nn.Linear(192, COMPLETION_VOCABULARY)
-            self.boundary_head = nn.Linear(192, 1)
-            self.language_head = nn.Linear(192, language_count)
+            self.embedding = nn.Embedding(BYTE_VOCABULARY, completion_embedding, padding_idx=PAD)
+            self.encoder = nn.GRU(completion_embedding, completion_hidden,
+                                  num_layers=completion_layers, batch_first=True)
+            self.byte_head = nn.Linear(completion_hidden, COMPLETION_VOCABULARY)
+            self.boundary_head = nn.Linear(completion_hidden, 1)
+            self.language_head = nn.Linear(completion_hidden, language_count)
 
         def forward(self, ids, hidden=None):
             output, hidden = self.encoder(self.embedding(ids), hidden)
@@ -514,6 +518,13 @@ def _export_model(model, path: Path, *, task: str, status: str, args, losses: di
     }
     if task == "identifier-relation" and status != "SUPERVISED":
         metadata["semanticSupervision"] = "unavailable; occurrence labels are weak bootstrap labels; link head is exported but untrained"
+    if task == "next-word":
+        metadata["completionConfig"] = {
+            "encoder": "GRU", "embeddingSize": model.embedding.embedding_dim,
+            "hiddenSize": model.encoder.hidden_size, "layers": model.encoder.num_layers,
+            "parameterCount": sum(p.numel() for p in model.parameters()),
+            "metric": "next-byte-top1-accuracy", "stateCarriedBetweenChunks": True,
+        }
     write_syl2(path, metadata, model.state_dict())
 
 
@@ -662,7 +673,12 @@ def _should_stop(history: list[float], args) -> tuple[bool, str | None]:
 
 def train_sources(args) -> dict:
     random.seed(args.seed)
-    torch, functional, causal, roles, symbols = _make_models(args.seed)
+    torch, functional, causal, roles, symbols = _make_models(
+        args.seed, completion_embedding=getattr(args, "completion_embedding", 96),
+        completion_hidden=getattr(args, "completion_hidden", 192),
+        completion_layers=getattr(args, "completion_layers", 2))
+    if getattr(args, "cpu_threads", None):
+        torch.set_num_threads(args.cpu_threads)
     device = torch.device(args.device)
     causal.to(device)
     roles.to(device)
@@ -767,6 +783,10 @@ def train_sources(args) -> dict:
                     "stopReason": stop_reason,
                 }
                 print(json.dumps(progress, separators=(",", ":")), file=sys.stderr, flush=True)
+                progress_path = Path(args.output_dir) / "epochs.jsonl"
+                progress_path.parent.mkdir(parents=True, exist_ok=True)
+                with progress_path.open("a", encoding="utf-8") as handle:
+                    handle.write(json.dumps(progress, separators=(",", ":")) + "\n")
             if stop_reason:
                 break
     if source_count == 0:
@@ -859,11 +879,19 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--learning-rate", type=float, default=3e-4)
     parser.add_argument("--seed", type=int, default=17)
     parser.add_argument("--device", default="cpu")
+    parser.add_argument("--completion-embedding", type=int, default=96)
+    parser.add_argument("--completion-hidden", type=int, default=192)
+    parser.add_argument("--completion-layers", type=int, default=2)
+    parser.add_argument("--cpu-threads", type=int, help="CPU intra-op threads; small recurrent batches often benefit from 1")
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
+    if min(args.completion_embedding, args.completion_hidden, args.completion_layers) < 1:
+        raise SystemExit("completion dimensions and layer count must be positive")
+    if args.cpu_threads is not None and args.cpu_threads < 1:
+        raise SystemExit("--cpu-threads must be positive")
     if args.sequence_bytes < 1 or args.max_bytes < 1:
         raise SystemExit("--sequence-bytes and --max-bytes must be positive")
     if not 0.0 < args.target_precision <= 1.0:

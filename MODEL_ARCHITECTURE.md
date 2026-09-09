@@ -345,6 +345,20 @@ Measure occurrence accuracy, candidate retrieval recall, exact target-link accur
 
 ## Model 3: causal full-prefix completion
 
+Capacity experiment: the Python trainer now supports configurable embedding
+width, GRU width, and GRU depth. The original 96/192/2 configuration contains
+473,298 parameters with the current 47-language registry. The larger experiment
+uses 160-dimensional embeddings and three 384-unit causal GRU layers, totaling
+2,562,322 parameters. Each layer updates a recurrent summary of the prefix;
+the final layer feeds the byte, boundary, and language heads. Its recurrent
+state is 1,152 float32 values (4,608 bytes), excluding weights and checkpoints.
+`completionConfig` in the SYL2 export records actual dimensions and parameter
+count. This requires a dimension-aware SYL2 runtime; the legacy Kotlin SYLM1
+runner cannot execute these neural artifacts. The tables below describe the
+original baseline; this experiment scales capacity without changing its
+causal byte-input contract. Validation currently reports next-byte top-1
+accuracy, despite the legacy `precision` field name.
+
 ### Selected model and meaning of context
 
 Use a two-layer unidirectional GRU. Feed every byte of the source before the cursor in order, carrying hidden state throughout the prefix. There is no default left truncation or fixed n-gram window.
