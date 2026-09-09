@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import io
 import json
 import keyword
@@ -11,6 +12,9 @@ import re
 import struct
 import sys
 import tokenize
+import urllib.error
+import urllib.request
+from datetime import datetime, timezone
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable, Iterator
@@ -367,6 +371,195 @@ def load_examples(path: str | None) -> list[tuple[str, list[Token], list[str]]]:
     return examples
 
 
+@dataclass(frozen=True)
+class SourceSpec:
+    """A source identity and its training metadata, never the source contents."""
+
+    uri: str
+    language: str | None = None
+    license_id: str | None = None
+    source_id: str | None = None
+    repository_commit: str | None = None
+    relative_path: str | None = None
+    split: str = "train"
+    provider_id: str = "raw-file"
+
+
+LANGUAGE_EXTENSIONS = {
+    ".py": "python", ".pyw": "python", ".js": "javascript", ".jsx": "javascript",
+    ".ts": "typescript", ".tsx": "typescript", ".json": "json", ".jsonc": "json",
+    ".kt": "kotlin", ".kts": "kotlin", ".java": "java", ".c": "c", ".h": "c",
+    ".cc": "cpp", ".cpp": "cpp", ".cxx": "cpp", ".cs": "csharp", ".go": "go",
+    ".rs": "rust", ".rb": "ruby", ".php": "php", ".swift": "swift",
+    ".scala": "scala", ".sql": "sql", ".lua": "lua", ".sh": "shell",
+    ".ps1": "powershell", ".r": "r", ".R": "r", ".m": "objective-c",
+}
+
+
+def _language_from_uri(uri: str) -> str | None:
+    suffix = Path(uri.split("?", 1)[0]).suffix
+    return LANGUAGE_EXTENSIONS.get(suffix.lower())
+
+
+def _source_specs(manifest: str | None, sources: list[str], default_license: str | None) -> list[SourceSpec]:
+    result: list[SourceSpec] = []
+    if manifest:
+        with open(manifest, encoding="utf-8") as handle:
+            for line_number, line in enumerate(handle, 1):
+                if not line.strip():
+                    continue
+                try:
+                    item = json.loads(line)
+                except json.JSONDecodeError as error:
+                    raise ValueError(f"invalid source manifest JSON on line {line_number}: {error}") from error
+                if not item.get("uri"):
+                    raise ValueError(f"source manifest line {line_number} has no uri")
+                result.append(SourceSpec(
+                    uri=str(item["uri"]),
+                    language=item.get("language"),
+                    license_id=item.get("licenseId", default_license),
+                    source_id=item.get("sourceId"),
+                    repository_commit=item.get("repositoryCommit"),
+                    relative_path=item.get("relativePath"),
+                    split=str(item.get("split", "train")),
+                    provider_id=str(item.get("providerId", "raw-file")),
+                ))
+    for uri in sources:
+        result.append(SourceSpec(uri=uri, language=_language_from_uri(uri), license_id=default_license))
+    if not result:
+        raise ValueError("provide --source or --manifest")
+    return result
+
+
+def _read_bounded(uri: str, max_bytes: int) -> bytes:
+    """Read one source into a bounded buffer; never creates a source cache."""
+    if max_bytes <= 0:
+        raise ValueError("--max-bytes must be positive")
+    if uri == "-":
+        stream = sys.stdin.buffer
+        close = False
+    elif uri.startswith(("http://", "https://")):
+        stream = urllib.request.urlopen(uri, timeout=30)  # no urllib cache is used
+        close = True
+        content_length = stream.headers.get("Content-Length")
+        if content_length and int(content_length) > max_bytes:
+            stream.close()
+            raise ValueError(f"source exceeds --max-bytes ({content_length} > {max_bytes})")
+    else:
+        stream = open(uri, "rb")
+        close = True
+    try:
+        result = bytearray()
+        while True:
+            chunk = stream.read(min(64 * 1024, max_bytes - len(result) + 1))
+            if not chunk:
+                break
+            result.extend(chunk)
+            if len(result) > max_bytes:
+                raise ValueError(f"source exceeds --max-bytes ({len(result)} > {max_bytes})")
+        return bytes(result)
+    finally:
+        if close:
+            stream.close()
+
+
+def _decode_source(raw: bytes) -> tuple[str, str]:
+    if raw.startswith(b"\xef\xbb\xbf"):
+        return raw[3:].decode("utf-8"), "utf-8-sig"
+    for encoding in ("utf-8", "utf-16", "latin-1"):
+        try:
+            return raw.decode(encoding), encoding
+        except UnicodeDecodeError:
+            continue
+    raise ValueError("source is not decodable")
+
+
+def _write_ledger(handle, spec: SourceSpec, status: str, *, run_id: str, raw: bytes | None = None,
+                  language: str | None = None, reason: str | None = None,
+                  encoding: str | None = None, label_coverage: dict | None = None) -> None:
+    """Write metadata only. Never include source text, tokens, or annotations."""
+    record = {
+        "runId": run_id,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "providerId": spec.provider_id,
+        "sourceId": spec.source_id,
+        "sourceUri": spec.uri,
+        "repositoryCommit": spec.repository_commit,
+        "relativePath": spec.relative_path,
+        "contentSha256": hashlib.sha256(raw).hexdigest() if raw is not None else None,
+        "byteCount": len(raw) if raw is not None else None,
+        "encoding": encoding,
+        "licenseId": spec.license_id,
+        "canonicalLanguageId": language,
+        "split": spec.split,
+        "teacherVersions": {"bootstrapLexer": "syntaxlm-legacy-1"},
+        "labelCoverage": label_coverage or {},
+        "status": status,
+        "reason": reason,
+    }
+    handle.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
+    handle.flush()
+
+
+def train_stream(specs: list[SourceSpec], epochs: int, max_bytes: int, ledger_path: str,
+                 output: str, output_format: str, license_policy: str = "require") -> dict:
+    """Train by reacquiring one source per epoch and discarding it after use.
+
+    This is intentionally the streaming bootstrap path for the existing SYLM v1
+    model. It does not claim to provide the neural three-model architecture yet.
+    """
+    if epochs < 1:
+        raise ValueError("--epochs must be positive")
+    if epochs > 1 and any(spec.uri == "-" for spec in specs):
+        raise ValueError("stdin is one-shot; use --epochs 1 or a reacquirable source")
+    model = AveragedPerceptron()
+    used = 0
+    skipped = 0
+    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
+    Path(ledger_path).parent.mkdir(parents=True, exist_ok=True)
+    with open(ledger_path, "a", encoding="utf-8") as ledger:
+        for epoch in range(epochs):
+            for spec in specs:
+                if license_policy == "require" and not spec.license_id:
+                    _write_ledger(ledger, spec, "SKIPPED", run_id=run_id, reason="missing licenseId")
+                    skipped += 1
+                    continue
+                raw: bytes | None = None
+                try:
+                    raw = _read_bounded(spec.uri, max_bytes)
+                    source, encoding = _decode_source(raw)
+                    language = normalize_language(spec.language or _language_from_uri(spec.uri) or "text")
+                    tokens = tokenize_code(source, language)
+                    labels = [token.hint if token.hint in KINDS else "plain" for token in tokens]
+                    previous_kind = None
+                    for index, gold in enumerate(labels):
+                        feature_list = features(tokens, index, previous_kind)
+                        guess = model.predict(feature_list)
+                        model.update(gold, guess, feature_list)
+                        previous_kind = gold
+                    _write_ledger(
+                        ledger, spec, "USED", run_id=run_id, raw=raw, language=language, encoding=encoding,
+                        label_coverage={"tokens": len(tokens), "epoch": epoch + 1},
+                    )
+                    used += 1
+                except (OSError, UnicodeError, ValueError, urllib.error.URLError) as error:
+                    _write_ledger(ledger, spec, "FAILED", run_id=run_id,
+                                  reason=type(error).__name__ + ": " + str(error)[:300])
+                finally:
+                    # Drop the only source-bearing references before the next example.
+                    del raw
+                    if "source" in locals():
+                        del source
+                    if "tokens" in locals():
+                        del tokens
+    model.averaged()
+    if output_format == "bin":
+        write_matrix_binary(model, output)
+    else:
+        Path(output).write_text(json.dumps(model.to_dict(), separators=(",", ":")), encoding="utf-8")
+    return {"used": used, "skipped": skipped, "epochs": epochs, "output": output, "ledger": ledger_path}
+
+
 def train(examples: list[tuple[str, list[Token], list[str]]], epochs: int) -> AveragedPerceptron:
     model = AveragedPerceptron()
     for _ in range(max(1, epochs)):
@@ -448,6 +641,24 @@ def command_train(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_train_stream(args: argparse.Namespace) -> int:
+    specs = _source_specs(args.manifest, args.source, args.license_id)
+    output_format = args.format
+    if output_format == "auto":
+        output_format = "bin" if Path(args.output).suffix == ".bin" else "json"
+    result = train_stream(
+        specs,
+        epochs=args.epochs,
+        max_bytes=args.max_bytes,
+        ledger_path=args.ledger,
+        output=args.output,
+        output_format=output_format,
+        license_policy=args.license_policy,
+    )
+    print(json.dumps(result, separators=(",", ":")))
+    return 0
+
+
 def command_highlight(args: argparse.Namespace) -> int:
     source = sys.stdin.read() if args.file == "-" else Path(args.file).read_text(encoding="utf-8")
     if args.model and Path(args.model).exists():
@@ -471,6 +682,24 @@ def build_parser() -> argparse.ArgumentParser:
     train_parser.add_argument("--epochs", type=int, default=8)
     train_parser.add_argument("--format", choices=("auto", "json", "bin"), default="auto")
     train_parser.set_defaults(func=command_train)
+    stream_parser = subparsers.add_parser(
+        "train-stream",
+        help="train the legacy matrix model from bounded, non-retained source streams",
+    )
+    stream_parser.add_argument("--source", action="append", default=[],
+                               help="local file, raw HTTP(S) file, or - for stdin; repeatable")
+    stream_parser.add_argument("--manifest", help="JSONL source metadata manifest")
+    stream_parser.add_argument("--license-id", help="license for direct --source entries")
+    stream_parser.add_argument("--license-policy", choices=("require", "allow"), default="require",
+                               help="require a manifest licenseId unless explicitly relaxed")
+    stream_parser.add_argument("--max-bytes", type=int, default=2 * 1024 * 1024,
+                               help="maximum in-memory size of one source")
+    stream_parser.add_argument("--ledger", default="source-use.jsonl",
+                               help="metadata-only source-use ledger")
+    stream_parser.add_argument("--output", default="syntaxlm.matrix.bin")
+    stream_parser.add_argument("--epochs", type=int, default=1)
+    stream_parser.add_argument("--format", choices=("auto", "json", "bin"), default="auto")
+    stream_parser.set_defaults(func=command_train_stream)
     highlight_parser = subparsers.add_parser("highlight", help="predict highlighting spans")
     highlight_parser.add_argument("--language", "-l", default="python")
     highlight_parser.add_argument("--model", "-m")

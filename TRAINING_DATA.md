@@ -25,7 +25,7 @@ The Kotlin app must be able to query the bundle's capability metadata and displa
 
 | Source | Intended use | Collection guidance |
 | --- | --- | --- |
-| Selected public repositories | Main source for all three models | Preserve complete project snapshots, dependency manifests and build configuration for semantic indexing. Record commit and file identity. |
+| Selected public repositories | Main source for all three models | Stream complete project snapshots when semantic indexing needs dependency manifests/build configuration. Record commit and file identity; do not retain the source snapshot after processing. |
 | User-owned or otherwise authorized projects | Domain-specific adaptation | Use only projects intentionally included in the corpus; retain an independent general evaluation set. |
 | The Stack / The Stack v2 language subsets | Broader raw-code coverage | Filter by canonical language/dialect, provenance, license metadata, duplicates, generated/vendor status, and content quality. These datasets do not directly provide our required span/link labels. |
 | Compiler/parser/indexer test suites | Rare syntax, ambiguous constructs, invalid code | Keep expected-valid and expected-invalid tests distinct. Audit suitability and avoid letting one suite dominate training. |
@@ -37,19 +37,41 @@ A loose-file corpus can supply model 1 and model 3. Model 2 usually needs comple
 
 Use language-specific sources to close gaps: scientific packages for R/Julia/Fortran/MATLAB, application projects for JVM/.NET/web languages, database scripts with available schema fixtures for SQL dialects, and documented test programs for languages with smaller public corpora. These are collection priorities, not claims that a particular teacher supports every target.
 
+## Streaming acquisition and source-retention policy
+
+The Python trainer must acquire training examples as streams and use them in memory. Raw source is not a training artifact and must not be written to a corpus directory, Python cache, dataset cache, temporary archive, debug log, exception report, TensorBoard event, or checkpoint. This is a hard requirement for the default trainer mode, not merely a recommended cleanup step.
+
+Each source provider exposes an iterator of bounded examples. A provider may read an HTTP response, repository archive, remote dataset shard, or authorized project export incrementally; it must decompress and decode one bounded file/example at a time, enforce byte and nesting limits, yield the example, and release its buffer after the batch and offline teacher steps finish. Large project-level semantic teachers may receive a bounded in-memory project view or a provider-specific remote query; they must not cause a checkout to be persisted locally.
+
+The trainer may write only model checkpoints/exports, aggregate metrics, and a source-use ledger. It must not enable implicit caches. Cache directories for dataset clients, HTTP bodies, archive downloads, parser outputs, and teacher workspaces are disabled or placed in an explicitly ephemeral memory-backed location; if a required third-party tool cannot satisfy this policy, that provider is unavailable in no-retention mode. A failed or interrupted run may restart acquisition; resumability stores provider cursors and ledger keys, never source bytes.
+
+The ledger records what was used without recording the source itself. At minimum, each accepted, rejected, skipped, and failed example records:
+
+```text
+runId, providerId, sourceUri, repositoryCommit, relativePath,
+contentSha256, byteCount, encoding, licenseId, canonicalLanguageId,
+dialectId, split, teacherVersions, labelCoverage, status, reason, timestamp
+```
+
+Hash source while it is in memory, then discard it. Do not place source text, snippets, identifiers, stack traces containing source, or raw annotations in the ledger. URL/repository identities and license metadata are still retained for reproducibility and compliance. The ledger itself is append-only, redacted before publication where necessary, and covered by access controls appropriate to private project metadata.
+
+The run manifest also records provider versions, request parameters, accepted terms, registry hash, sampling seed, split/duplicate decisions, hint perturbation rates, teacher configurations, and the exact model/data outputs. A manifest entry proves that an example was considered or used; it does not authorize a source license or replace attribution obligations. Providers must reject missing/unclear rights according to the configured policy before training.
+
+Tests for every provider must assert that no source-bearing path or cache is created, that ledger records contain no source payload, that buffers are released after consumption, and that a second run can reproduce the same source-use decisions from the manifest plus provider cursors. The no-retention mode must be the mode used for private or restricted sources unless the owner explicitly authorizes storage.
+
 ## Required provenance and source fidelity
 
-The normalized dataset must retain:
+The normalized example held in memory must carry:
 
 - Registry version/hash, canonical language ID, optional dialect/version and original source label.
 - Repository/source URL, commit/content hash, relative path, project ID, license metadata, and acquisition version/date.
-- Original file encoding and decoding policy, immutable decoded source, and its content hash.
+- Original file encoding and decoding policy, the decoded source only for the lifetime of the example, and its content hash.
 - Split assignment, duplicate-cluster ID, generated/vendor/test indicators, and augmentation ancestry.
 - Teacher name/version/configuration, success/partial/error state, annotation confidence, and coverage per output head.
 - Document/region language evidence, ambiguity, and host/embedded relationships.
 - Explicit offsetEncoding=utf16 and validated inclusive-start/exclusive-end ranges.
 
-Keep whitespace, CRLF, strings, comments, and non-ASCII spelling. Decode legacy encodings into the editor's Unicode text with recorded policy; do not normalize away distinguishing syntax. Retain a mapping to original bytes when needed for teacher offsets. Reject malformed mappings rather than silently shifting annotations.
+Keep whitespace, CRLF, strings, comments, and non-ASCII spelling while the example is being processed. Decode legacy encodings into the editor's Unicode text with recorded policy; do not normalize away distinguishing syntax. Retain a mapping to original bytes in memory when needed for teacher offsets, then discard it with the example. Reject malformed mappings rather than silently shifting annotations.
 
 The training loader converts UTF-16 locations to neural byte/scalar boundaries using one checked mapping. Codepoint, byte, and UTF-16 offsets must never be mixed. Full-file and snippet examples must carry the same original document identity and a snippet base offset.
 

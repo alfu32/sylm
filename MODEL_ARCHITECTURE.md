@@ -507,12 +507,13 @@ The detailed corpus/annotation requirements and collection guidance are in [TRAI
 - Train all models in AUTO mode as the default, using supported-language, unknown-language, non-code, short-prefix, and mixed-source examples. A code file's project label is not automatically an identifiable label for every crop.
 - Balance language exposure using capped temperature sampling and per-language quotas. Compute semantic-head batches only from actual semantic annotations; mask absent labels rather than teach false negatives.
 - Generate parser/compiler/indexer annotations offline; Kotlin has no dependency on annotation tools. Code-only pretraining does not establish definition-link supervision.
+- Acquire training data through bounded streaming providers: use source in memory, discard it after the batch/teacher step, and write only model artifacts, aggregate metrics, and a redacted source-use ledger. No raw source or implicit dataset/archive/parser cache is allowed in the default trainer mode; see [TRAINING_DATA.md](TRAINING_DATA.md).
 - Split and deduplicate by project before cropping or augmentation. Evaluate macro averages, worst-language results, dialect/confusion groups, calibration, and per-task coverage as well as overall totals.
 - Scale model width only with measured benefit and device budgets. The old tiny bootstrap corpus and reference parameter sizes do not demonstrate broad multilingual capability.
 
 ## Implementation order and acceptance gates
 
-1. Freeze the language registry, TIOBE snapshot and corpus manifest; collect a multilingual pilot. Implement shared snapshot/range types, byte-encoding specification, SYL2 schema, and Python/Kotlin fixtures. Start neural work only after matching byte IDs and coordinates.
+1. Freeze the language registry, TIOBE snapshot and corpus manifest; collect a multilingual pilot. The legacy `train-stream` command is the initial bounded raw-file acquisition/ledger slice. Implement shared snapshot/range types, byte-encoding specification, SYL2 schema, and Python/Kotlin fixtures. Start neural work only after matching byte IDs and coordinates.
 2. Implement the Python trainer/exporter, language heads/conditioning, and Kotlin GRU/linear operators. Compare single-step and sequence states, reverse-direction outputs, and exported logits.
 3. Deliver model 1 lexical and nested-region training/inference, with exact offset tests and parser/scanner baselines.
 4. Deliver model 2 identifier, declaration/scope, and link training/inference. Declare validated semantic coverage per language and publish incorrect-link rates.
@@ -527,6 +528,7 @@ Model artifacts and nine bootstrap snippets alone do not establish editor qualit
 
 - The existing Python and Kotlin tokenizers differ: Python uses tokenize for valid Python; Kotlin treats // as a comment regardless of language and has different operator/number boundaries and keyword tables.
 - The old binary is a feature dictionary with dense float32 class rows, not a neural recurrent tensor container.
+- `train-stream` currently supports bounded raw files/HTTP(S) files and the legacy bootstrap labels only. It does not yet stream repository archives/dataset shards through project-level semantic teachers or train the three neural models.
 - Python training annotations currently use codepoint offsets while predictions use UTF-16. The new schemas require explicit UTF-16 conversion and validation.
 - The current ANSI renderer searches for span text; this can select an earlier repeated occurrence. Render by validated coordinates.
 - The prototype has no nested region model, scope/reference model, completion model, document revisions, or cross-runtime golden suite.

@@ -6,6 +6,8 @@ The Python side is the trainer/exporter only. The Kotlin side does not invoke Py
 
 The planned three-model design is documented in [MODEL_ARCHITECTURE.md](MODEL_ARCHITECTURE.md). The current implementation is the model-1 linear prototype; models 2 and 3 are specified there and require separate artifacts.
 
+The multilingual acquisition, annotation, provenance, and no-source-retention requirements are documented in [TRAINING_DATA.md](TRAINING_DATA.md). The automated neural trainer described there is planned work; the current CLI remains the legacy prototype.
+
 This is deliberately a first experiment, not a replacement for a full parser. The useful research question is whether a small learned model can recover enough context to make highlighting feel natural, while remaining cheap enough to run in an editor.
 
 ## Quick start
@@ -17,6 +19,24 @@ printf 'def greet(name):\n    return "hello " + name\n' \
 ```
 
 The CLI has no external Python dependencies; `requirements.txt` is intentionally empty apart from an explanatory comment.
+
+For a source-use-tracked, no-retention training run, provide a JSONL manifest. Each line identifies one raw file or HTTP(S) file; it may include `language`, `licenseId`, `sourceId`, `repositoryCommit`, `relativePath`, `split`, and `providerId`:
+
+```json
+{"uri":"https://example.invalid/project/main.py","language":"python","licenseId":"MIT","sourceId":"project/main.py"}
+```
+
+Then run:
+
+```bash
+python3 syntaxlm.py train-stream \
+  --manifest sources.jsonl \
+  --output syntaxlm.matrix.bin \
+  --ledger source-use.jsonl \
+  --max-bytes 2097152
+```
+
+`train-stream` reads one bounded source into memory, trains the legacy SYLM v1 bootstrap model, discards the source, and writes only the model and metadata-only ledger. It requires `licenseId` by default; `--license-policy allow` is an explicit override for authorized local data. The manifest and ledger are metadata, not a source corpus. This command is the acquisition foundation for the neural trainer specified in [MODEL_ARCHITECTURE.md](MODEL_ARCHITECTURE.md); it is not yet the three neural models.
 
 The default output is JSON spans:
 
