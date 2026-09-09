@@ -12,6 +12,7 @@ semantic supervision.
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import random
 import sys
@@ -30,7 +31,7 @@ from .annotations import (
     utf16_range_to_bytes,
 )
 from .registry import LANGUAGES, REGISTRY_HASH, REGISTRY_VERSION, language_index
-from .streaming_sources import SourceLedger, iter_sources, source_specs
+from .streaming_sources import SourceLedger, iter_mlcpd_sources, iter_sources, source_specs
 from .syl2_format import write_syl2
 
 
@@ -671,8 +672,10 @@ def train_sources(args) -> dict:
     roles_optimizer = torch.optim.AdamW(roles.parameters(), lr=args.learning_rate) if "roles" in tasks else None
     symbols_optimizer = torch.optim.AdamW(symbols.parameters(), lr=args.learning_rate) if "symbols" in tasks else None
     training_specs, validation_specs = _split_specs(args.specs)
-    if not training_specs:
-        raise ValueError("no training source was selected; check manifest split values")
+    mlcpd_files = getattr(args, "mlcpd_files", None) or []
+    max_mlcpd_examples = getattr(args, "max_mlcpd_examples_per_epoch", 0)
+    if not training_specs and not mlcpd_files:
+        raise ValueError("no training source was selected; check manifest split values or MLCPD files")
     source_count = 0
     language_counts: dict[str, int] = {}
     losses = {"completion": [], "roles": [], "symbols": []}
@@ -684,7 +687,14 @@ def train_sources(args) -> dict:
     with SourceLedger(args.ledger) as ledger:
         for epoch in range(args.epochs):
             epoch_losses = {task: [] for task in losses}
-            for source in iter_sources(training_specs, args.max_bytes, ledger, args.license_policy):
+            source_iterators = []
+            if training_specs:
+                source_iterators.append(iter_sources(training_specs, args.max_bytes, ledger, args.license_policy))
+            if mlcpd_files:
+                source_iterators.append(iter_mlcpd_sources(
+                    mlcpd_files, args.max_bytes, ledger, max_mlcpd_examples
+                ))
+            for source in itertools.chain.from_iterable(source_iterators):
                 source_language = source.spec.language or "text"
                 language_name = normalize_language(source_language)
                 language = language_index(source_language)
@@ -824,6 +834,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="streaming multilingual SYL2 trainer/exporter")
     parser.add_argument("--source", action="append", default=[], help="local/raw HTTP file; repeatable")
     parser.add_argument("--manifest", help="JSONL source metadata manifest")
+    parser.add_argument("--mlcpd-file", action="append", dest="mlcpd_files",
+                        help="MLCPD Parquet filename, e.g. python_parsed_1.parquet; repeatable")
+    parser.add_argument("--max-mlcpd-examples-per-epoch", type=int, default=1000)
     parser.add_argument("--annotation-manifest", "--annotations", dest="annotation_manifest",
                         help="JSONL gold role/definition/usage annotation manifest")
     parser.add_argument("--license-id", help="license for direct --source entries")
@@ -864,7 +877,8 @@ def main() -> int:
     args.tasks = {"completion", "roles", "symbols"} if "all" in args.tasks else set(args.tasks)
     annotation_records = load_annotations(args.annotation_manifest)
     args.annotation_index = annotation_index(annotation_records)
-    args.specs = source_specs(args.manifest, args.source, args.license_id)
+    args.specs = source_specs(args.manifest, args.source, args.license_id) \
+        if args.manifest or args.source else []
     if not args.specs and annotation_records:
         args.specs = [record.spec for record in annotation_records]
     if args.epochs > 1 and any(item.uri == "-" for item in args.specs):

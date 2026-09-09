@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import tempfile
 import urllib.error
 from dataclasses import dataclass, replace
 from datetime import datetime, timezone
@@ -116,3 +118,70 @@ def iter_sources(specs: list[SourceSpec], max_bytes: int, ledger: SourceLedger,
         finally:
             # The generator drops its references after the consumer resumes it.
             del source
+
+
+def iter_mlcpd_sources(files: list[str], max_bytes: int, ledger: SourceLedger,
+                       max_examples: int | None = None) -> Iterator[StreamedSource]:
+    """Stream MLCPD Parquet rows without retaining source or dataset shards.
+
+    Hugging Face dataset caches are directed to a temporary cache directory;
+    it is removed when this iterator finishes. Source text and parser JSON are
+    held only for the current row. The dataset's MIT card/license metadata is
+    recorded as provenance, while original-source licensing remains a release
+    audit requirement.
+    """
+    try:
+        from datasets import load_dataset
+    except ModuleNotFoundError as error:
+        raise RuntimeError("MLCPD streaming requires `datasets`; install requirements.txt") from error
+    dataset_root = os.environ.get("LOCAL_LANG_MODEL_DATASET_CACHE")
+    temporary = None
+    if not dataset_root:
+        volatile_root = "/dev/shm" if os.path.isdir("/dev/shm") and os.access("/dev/shm", os.W_OK) else None
+        temporary = tempfile.TemporaryDirectory(prefix="local-lang-models-hf-", dir=volatile_root)
+        dataset_root = temporary.name
+    os.environ.setdefault("HF_HOME", dataset_root)
+    os.environ.setdefault("HF_DATASETS_CACHE", os.path.join(dataset_root, "datasets"))
+    os.environ.setdefault("HF_HUB_CACHE", os.path.join(dataset_root, "hub"))
+    yielded = 0
+    try:
+        for filename in files:
+            dataset = load_dataset(
+                "jugalgajjar/MultiLang-Code-Parser-Dataset",
+                data_files=filename,
+                split="train",
+                streaming=True,
+            )
+            for row_number, row in enumerate(dataset):
+                if max_examples is not None and yielded >= max_examples:
+                    return
+                code = str(row.get("code", ""))
+                raw = code.encode("utf-8")
+                if not code or len(raw) > max_bytes:
+                    continue
+                language = str(row.get("language", "unknown")).lower()
+                spec = SourceSpec(
+                    uri=f"hf://jugalgajjar/MultiLang-Code-Parser-Dataset/{filename}#row={row_number}",
+                    language=language,
+                    license_id="MLCPD-MIT-card-review-required",
+                    source_id=f"mlcpd:{filename}:{row_number}",
+                    split="train",
+                    provider_id="mlcpd-stream-v1",
+                )
+                source = StreamedSource(
+                    spec=spec,
+                    raw=raw,
+                    text=code,
+                    encoding="utf-8",
+                    content_sha256=hashlib.sha256(raw).hexdigest(),
+                )
+                yield source
+                ledger.record(source, "USED", labels={
+                    "dataset": "MLCPD", "row": row_number,
+                    "parserPayloadPresent": bool(row.get("universal_schema")),
+                }, teacher_versions={"parser": "MLCPD-tree-sitter-universal-schema"})
+                yielded += 1
+                del source, raw, code, row
+    finally:
+        if temporary is not None:
+            temporary.cleanup()

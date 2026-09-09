@@ -4,3 +4,6 @@ numpy>=1.26,<3
 torch>=2.2,<3
 tree-sitter>=0.25,<0.26
 tree-sitter-language-pack>=1.16,<2
+# Required only for streaming MLCPD Parquet rows; the trainer directs caches
+# to an ephemeral directory and never retains source shards.
+datasets>=4,<5

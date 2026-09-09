@@ -93,7 +93,38 @@ val spans = provider.highlight(source, "kotlin")
 
 The `SYLM` v1 binary is a UTF-8 feature vocabulary followed by little-endian float32 rows. It is not the SYL2 neural container.
 
-## Streaming Training
+## Asset Provisioning and Streaming Training
+
+Provision the grammar cache, coverage report, syntax-teacher configuration, and
+an auditable MLCPD run manifest in one command:
+
+```bash
+./.venv/bin/python -m training.provision_assets --install-dependencies
+```
+
+The provisioner defaults to the nine MLCPD Parquet shards for C, C#, C++, Go,
+Java, JavaScript, Kotlin-compatible Java syntax coverage, Python, Rust, and
+TypeScript. It records the exact registry hash and selected shards in
+`training-run.json`. MLCPD is parser supervision/raw code training material,
+not compiler-grade definition/use gold; its original-source license status
+must be reviewed before redistribution.
+
+Run directly from streamed MLCPD rows, with no retained dataset shard:
+
+```bash
+./.venv/bin/python -m training.syl2_trainer \
+  --mlcpd-file python_parsed_1.parquet \
+  --mlcpd-file typescript_parsed_1.parquet \
+  --output-dir runs/mlcpd-cpu --ledger runs/mlcpd-cpu-source-use.jsonl \
+  --tasks all --epochs 20 --max-mlcpd-examples-per-epoch 1000
+```
+
+The HF cache is placed in a temporary volatile directory when `/dev/shm` is
+available and is deleted when acquisition finishes. Set
+`LOCAL_LANG_MODEL_DATASET_CACHE` only when an explicit persistent cache is
+desired. Epoch completion is emitted as JSON on stderr so a supervisor can
+monitor losses and validation/early-stop state while the final result remains
+JSON on stdout.
 
 Streaming trainers take source references from direct `--source` values or a JSONL manifest. Each manifest line may include:
 
@@ -210,9 +241,10 @@ coverage report:
   --cache-dir .treesitter-cache --report grammar-coverage.json
 ```
 
-The current prefetch retrieved 33 distinct grammars. `scratch`, `gml`, and
-`abap` need dedicated grammars or compiler-specific teachers; `unknown` is an
-intentional abstention class. Family/dialect fallbacks are recorded in
+The current prefetch retrieves 38 distinct grammars for the expanded registry.
+`scratch`, `gml`, and `abap` need dedicated grammars or compiler-specific
+teachers; `unknown` is an intentional abstention class. Family/dialect
+fallbacks are recorded in
 [grammar-coverage.json](grammar-coverage.json) and are not counted as exact
 language support.
 

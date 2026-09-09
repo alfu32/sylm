@@ -1,7 +1,7 @@
 {
   "python": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -15,7 +15,7 @@
   },
   "c": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -29,7 +29,7 @@
   },
   "cpp": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -43,7 +43,7 @@
   },
   "java": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -57,7 +57,7 @@
   },
   "csharp": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -71,7 +71,7 @@
   },
   "javascript": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -85,7 +85,7 @@
   },
   "visual-basic": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -99,7 +99,7 @@
   },
   "sql": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -113,7 +113,7 @@
   },
   "r": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -127,7 +127,7 @@
   },
   "rust": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -141,7 +141,7 @@
   },
   "fortran": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -155,7 +155,7 @@
   },
   "go": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -169,7 +169,7 @@
   },
   "delphi": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -183,7 +183,7 @@
   },
   "php": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -197,7 +197,7 @@
   },
   "assembly": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -211,7 +211,7 @@
   },
   "ada": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -225,7 +225,7 @@
   },
   "swift": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -239,7 +239,7 @@
   },
   "objective-c": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -253,7 +253,7 @@
   },
   "cobol": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -267,7 +267,7 @@
   },
   "julia": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -281,7 +281,7 @@
   },
   "ruby": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -295,7 +295,7 @@
   },
   "perl": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -309,7 +309,7 @@
   },
   "sas": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -323,7 +323,7 @@
   },
   "classic-visual-basic": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -337,7 +337,7 @@
   },
   "kotlin": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -351,7 +351,7 @@
   },
   "matlab": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -365,7 +365,7 @@
   },
   "caml": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -379,7 +379,7 @@
   },
   "prolog": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -393,7 +393,7 @@
   },
   "lua": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -407,7 +407,7 @@
   },
   "powershell": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -421,7 +421,7 @@
   },
   "d": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -435,7 +435,7 @@
   },
   "plsql": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -449,7 +449,7 @@
   },
   "transact-sql": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -463,7 +463,7 @@
   },
   "vbscript": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -477,7 +477,7 @@
   },
   "ocaml": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -491,7 +491,7 @@
   },
   "typescript": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
@@ -505,11 +505,95 @@
   },
   "zig": {
     "command": [
-      ".venv/bin/python",
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
       "-m",
       "training.tree_sitter_teacher",
       "--language",
       "zig"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "json": {
+    "command": [
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "json"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "xml": {
+    "command": [
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "xml"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "html": {
+    "command": [
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "html"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "jsx": {
+    "command": [
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "jsx"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "tsx": {
+    "command": [
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "tsx"
+    ],
+    "name": "tree-sitter-syntax",
+    "version": "1.16.2",
+    "timeoutSeconds": 30,
+    "maxOutputBytes": 8388608,
+    "semanticStatus": "syntax-only"
+  },
+  "svelte": {
+    "command": [
+      "/home/devlin/Development/local-lang-models/.venv/bin/python",
+      "-m",
+      "training.tree_sitter_teacher",
+      "--language",
+      "svelte"
     ],
     "name": "tree-sitter-syntax",
     "version": "1.16.2",
