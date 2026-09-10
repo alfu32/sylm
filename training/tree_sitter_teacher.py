@@ -70,6 +70,7 @@ def annotate(request: dict) -> dict:
     tree = pack.get_parser(grammar).parse(source_bytes)
     role_spans = []
     constructs = []
+    identifiers = []
     cursor = tree.walk()
     visited = []
     while True:
@@ -83,6 +84,9 @@ def annotate(request: dict) -> dict:
         if construct and end > start:
             constructs.append({"start": _utf16_from_byte(source_bytes, start),
                                "end": _utf16_from_byte(source_bytes, end), "kind": construct})
+        if _role(node.type) == "identifier" and end > start:
+            parent = node.parent.type.lower() if node.parent else ""
+            identifiers.append((start, end, source_bytes[start:end].decode("utf-8"), parent))
         if cursor.goto_first_child():
             visited.append(False)
             continue
@@ -91,13 +95,34 @@ def annotate(request: dict) -> dict:
             visited.pop()
         if not visited:
             break
+    # Tree-sitter is a parser, not a name resolver. These conservative labels
+    # are silver supervision: declaration-shaped parents become definitions;
+    # other identifiers become usages, linked only to the nearest preceding
+    # same-name definition in this file. Ambiguous/cross-file cases remain
+    # unresolved rather than being presented as compiler-grade gold.
+    definition_markers = ("declarator", "declaration", "parameter", "function", "class", "struct", "type", "field")
+    definitions, usages, relations = [], [], []
+    prior = {}
+    for start, end, name, parent in sorted(identifiers):
+        a, b = _utf16_from_byte(source_bytes, start), _utf16_from_byte(source_bytes, end)
+        is_definition = any(marker in parent for marker in definition_markers)
+        if is_definition:
+            identifier = f"definition:{a}:{b}"
+            definitions.append({"id": identifier, "nameRange": {"start": a, "end": b}, "kind": "unknown"})
+            prior.setdefault(name, []).append(identifier)
+        else:
+            usages.append({"start": a, "end": b, "kind": "unknown"})
+            target = prior.get(name, [])[-1] if prior.get(name) else None
+            relations.append({"usageRange": {"start": a, "end": b}, "definitionId": target,
+                              "status": "resolved" if target else "no_definition"})
     return {
         "roleSpans": role_spans,
-        "definitions": [],
-        "usages": [],
+        "definitions": definitions,
+        "usages": usages,
         "constructs": constructs,
-        "relations": [],
-        "teacher": {"name": "tree-sitter", "version": "1.16.2", "semanticStatus": "syntax-only"},
+        "relations": relations,
+        "teacher": {"name": "tree-sitter-heuristic", "version": "1.16.2", "semanticStatus": "silver-not-gold",
+                    "occurrenceCoverage": "partial"},
     }
 
 

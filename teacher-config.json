@@ -7,11 +7,11 @@
       "--language",
       "python"
     ],
-    "name": "tree-sitter-syntax",
+    "name": "tree-sitter-heuristic",
     "version": "1.16.2",
     "timeoutSeconds": 30,
     "maxOutputBytes": 8388608,
-    "semanticStatus": "syntax-only"
+    "semanticStatus": "silver-not-gold"
   },
   "c": {
     "command": [
