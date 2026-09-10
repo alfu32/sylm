@@ -1,6 +1,40 @@
 # Multilingual training data requirements
 
-Status: collection and training specification for [MODEL_ARCHITECTURE.md](MODEL_ARCHITECTURE.md). No corpus has been collected and no multilingual training is implied by this document.
+Status: data requirements for [MODEL_ARCHITECTURE.md](MODEL_ARCHITECTURE.md) and the active [split semantic pipeline](SEMANTIC_PIPELINE.md). This specification is not evidence of corpus coverage; consult individual run ledgers and reports for what was actually trained.
+
+## Active split-detector and intelligence training contract
+
+`training.semantic_trainer` consumes the existing annotation JSONL format. Each row identifies source URI, language, license, split, content hash, teacher/version, `definitions`, and `usages`. Provide explicit project-disjoint `train` and `validation` assignments; reserve a separate test set. All ranges and optional usage `queryPosition` values are UTF-16 code-unit offsets into the exact source revision, with exclusive ends. Source hashes and boundaries are checked before training or evaluation. Supply hashes even though the compatibility loader permits omission.
+
+Definitions need unique local IDs, name ranges (`nameRange` or `start`/`end`), and kinds. Usages need name ranges, kinds, and resolved local `definitionId` targets where known. The new detectors currently learn name ranges and eight coarse kinds; declaration bodies, scopes, receiver types, and import relationships require additional future output heads.
+
+Only set `teacher.occurrenceCoverage: "complete"` if **every** relevant definition and usage in the source has been annotated, including builtins and external occurrences even when their links cannot be resolved. With partial/unspecified coverage, unannotated bytes are ignored, not labeled as non-symbols. Exact-span precision is computed only on complete sources; annotated recall can also be reported on partial ones. Do not promote an incomplete index export to complete coverage merely because the teacher exited successfully.
+
+For example, for the entire source `x = 1\nx\n`, an authored fixture may include:
+
+```json
+{
+  "uri": "fixtures/local-use.py",
+  "language": "python",
+  "licenseId": "authored-test-fixture",
+  "split": "train",
+  "teacher": {"name": "reviewed-fixture", "version": "1", "occurrenceCoverage": "complete"},
+  "definitions": [{"id": "x-definition", "start": 0, "end": 1, "kind": "variable"}],
+  "usages": [{"start": 6, "end": 7, "kind": "variable", "definitionId": "x-definition", "queryPosition": 6}]
+}
+```
+
+Add the real `contentSha256` when building the manifest. Flatten the example to one JSON object per line. This format example is not a production corpus or a license grant for unrelated source.
+
+Train detectors first, freeze their exported weights, then train intelligence on their **predicted** records. Teacher labels select loss targets only. Do not replace predicted names, kinds, confidence, or spans with gold values when building ranker inputs. Missing predicted usages, missing candidate definitions, unsupported external targets, and candidate overflow must appear in the coverage report. Only an explicit teacher-confirmed `status: "no_definition"` supervises the null candidate; teacher failure and missing dependencies never do.
+
+The current ranker training supports local links, with at most 512 predicted definition candidates per source. Candidate features are generated one usage at a time. Use out-of-fold or disjoint detector-prediction data for production stage-two training; the initial CLI supports a simpler frozen-detector pass over the training sources. Never use validation/test labels for either training stage. Include same-name hard negatives, far-away correct definitions, near-but-wrong candidates, shadowing, and forward references; proximity is evidence, not a ground-truth rule.
+
+Indexer teachers should emit the optional normalized `semanticContext` fields defined in `training/semantic_context.py`. Missing context is unknown and must be masked, never encoded as a negative. The current ranker records these fields only as an extensible contract; a matching feature-schema revision is required before they affect scores.
+
+The query position is an input feature, not itself a completion label. The implemented ranker uses usage-to-definition targets. Future next-word training must slice the source **before** running bidirectional detectors, feed only prefix-derived records and cursor distances, and hold out the next complete code word as the target. Merely filtering full-document detector spans to positions before the cursor leaks future context through their neural activations/confidences. Compare navigation metrics, completion exact-word metrics, and upstream candidate coverage separately.
+
+The remainder of this document includes broader data goals for the legacy three-task design. Its Model 2 requirements apply across the split detectors and ranker; features not yet represented by their output schema remain collection/design requirements, not implemented capabilities.
 
 ## Scope and coverage accounting
 

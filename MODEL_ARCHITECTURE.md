@@ -1,6 +1,8 @@
-# Three-model architecture
+# Model architecture
 
-Status: revised implementation specification, incorporating multilingual training, automatic programming-language recognition, and the requirement that local models do the analysis while the editor gathers results. The repository currently contains only the legacy perceptron highlighter and its SYLM v1 Kotlin runner. The three providers and neural trainers below are proposed work, not existing functionality.
+Active implementation update: syntax highlighting stays unchanged; semantic analysis now uses independent definition and usage detectors followed by a small learned definition ranker. Python training and matrix-only Kotlin inference for that pipeline are implemented. See [SEMANTIC_PIPELINE.md](SEMANTIC_PIPELINE.md) for the authoritative dimensions, layers, position features, artifact contract, and current limitations.
+
+The sections below retain the earlier three-model design and broader acceptance requirements. In particular, the combined identifier model described below is superseded for new work by the split pipeline. Proposed scope/type reasoning, full-declaration spans, and context-conditioned next-word generation are not capabilities of the new ranker yet. The older SYL2 trainer remains a compatibility path; neither its byte-accuracy results nor the new tiny smoke fixture establish multilingual semantic precision.
 
 ## Review decisions
 

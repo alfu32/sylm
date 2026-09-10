@@ -1,0 +1,39 @@
+{
+  "outputs": {
+    "definitions": "/home/devlin/Development/local-lang-models/runs/semantic-split-smoke/definitions.model.bin",
+    "usages": "/home/devlin/Development/local-lang-models/runs/semantic-split-smoke/usages.model.bin",
+    "intelligence": "/home/devlin/Development/local-lang-models/runs/semantic-split-smoke/code-intelligence.model.bin"
+  },
+  "detectorSteps": {
+    "definitions": 80,
+    "usages": 80
+  },
+  "intelligenceSteps": 40,
+  "intelligenceStatus": "ANNOTATION_SUPERVISED",
+  "annotationManifest": "/tmp/semantic-fixtures-93e2lp7c/annotations.jsonl",
+  "ledger": "/home/devlin/Development/local-lang-models/runs/semantic-split-smoke-source-use.jsonl",
+  "validationSources": 1,
+  "trainingSources": 2,
+  "settings": {
+    "annotation_manifest": "/tmp/semantic-fixtures-93e2lp7c/annotations.jsonl",
+    "manifest": null,
+    "tasks": [
+      "all"
+    ],
+    "definitions_model": null,
+    "usages_model": null,
+    "output_dir": "/home/devlin/Development/local-lang-models/runs/semantic-split-smoke",
+    "ledger": "/home/devlin/Development/local-lang-models/runs/semantic-split-smoke-source-use.jsonl",
+    "epochs": 40,
+    "intelligence_epochs": 10,
+    "sequence_bytes": 32,
+    "max_bytes": 262144,
+    "learning_rate": 0.003,
+    "cpu_threads": 1
+  },
+  "seeds": {
+    "definitions": 17,
+    "usages": 18,
+    "intelligence": 19
+  }
+}

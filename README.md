@@ -2,7 +2,7 @@
 
 Small local language models for source-code understanding, designed so a Kotlin editor client can consume exported binary artifacts without invoking Python.
 
-The project is currently in bootstrap state. It has a working legacy SYLM1 syntax highlighter with a Kotlin matrix runner, plus streaming trainers for SYLM1 and SYL2 artifacts. The SYL2 Python trainer now accepts gold role and local definition-link annotations, but SYL2 Kotlin inference and broad semantic coverage are not complete yet.
+The project is in bootstrap state. Syntax highlighting is unchanged. The new semantic pipeline has independent definition and usage detectors, followed by a small learned definition ranker trained on their actual predictions. Python trains and exports the three SYL2 binaries; a dependency-free Kotlin/JVM provider runs them. Broad semantic quality and context-conditioned next-word completion are not established yet.
 
 ## Current Scope
 
@@ -10,6 +10,9 @@ Implemented today:
 
 - legacy `SYLM` v1 syntax model: averaged perceptron, dependency-free Python trainer, portable matrix export;
 - Kotlin `SYLM` v1 provider/runner: consumes only the exported matrix binary;
+- independent neural `definitions` and `usages` trainers, with UTF-16 source ranges and learned language/kind heads;
+- `code-intelligence` v1: a learned candidate ranker using predicted records, confidence, names, kinds, positions, and query distances;
+- Kotlin runtime for these three new semantic binaries, with checksum/dependency validation, Unicode alignment, abstention, and prefix-only analysis;
 - bounded streaming source acquisition: reads one source at a time, uses it in memory, writes a metadata-only ledger;
 - multilingual language registry for the TIOBE top-40 target set, `unknown`, and supplemental JSON/XML/HTML/JSX/TSX/Svelte formats;
 - Tree-sitter grammar prefetch and coverage report for the target registry;
@@ -22,21 +25,25 @@ Implemented today:
 
 Not complete yet:
 
-- Kotlin SYL2 neural runtime;
+- Kotlin runtime for the older SYL2 role and byte-completion architectures (the new semantic architectures are supported);
+- next-word generation conditioned on predicted definitions/usages; the new ranker currently resolves usages, not arbitrary code completions;
 - compiler/indexer teacher adapters and broad cross-file definition-to-usage coverage;
 - validated 99% precision across languages/tasks;
 - automatic public-source discovery/crawling with license policy beyond manifest-driven raw file acquisition;
 - semantic navigation quality for imports, overloads, members, shadowing, and cross-file symbols.
 
-The detailed architecture is in [MODEL_ARCHITECTURE.md](MODEL_ARCHITECTURE.md). Training-data and retention rules are in [TRAINING_DATA.md](TRAINING_DATA.md).
+The active semantic implementation is documented layer by layer in [SEMANTIC_PIPELINE.md](SEMANTIC_PIPELINE.md). [MODEL_ARCHITECTURE.md](MODEL_ARCHITECTURE.md) retains the broader design and historical architectures. Training-data and retention rules are in [TRAINING_DATA.md](TRAINING_DATA.md).
 
 ## Model Plan
 
-The target system has three local models:
+The revised system keeps syntax separate and splits semantic analysis:
 
 1. `token-role`: classifies source ranges as keyword, identifier, punctuation, literal, comment, region, and related syntax roles while preserving positions.
-2. `identifier-relation`: detects definitions/usages and links each usage to its definition where enough source/index context is available.
-3. `next-word`: predicts the next word/token from the whole previous code prefix.
+2. `definitions`: predicts definition name ranges and kinds.
+3. `usages`: independently predicts usage name ranges and kinds.
+4. `code-intelligence`: consumes those predictions plus query position. The implemented first stage ranks definitions for a usage; completion conditioned on the same records remains a subsequent stage.
+
+The previous combined `symbols` trainer and byte-completion models remain available through the legacy SYL2 CLI. Their weights are not interchangeable with the new split-model binaries.
 
 The Kotlin client should gather model results, validate ranges, cache document snapshots, and expose editor actions. It should not depend on Python code or offline annotation tools.
 
@@ -53,17 +60,40 @@ For the legacy CLI and SYLM1 trainer:
 python3
 ```
 
-For SYL2 neural training:
+For SYL2 neural training, use a project-local environment (not global installation):
 
 ```bash
-python3 -m pip install -r requirements.txt
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
 ```
 
-`requirements.txt` currently contains `torch` and `numpy` for SYL2. The legacy path remains standard-library only.
+Neural training uses `torch` and `numpy`. `requirements.txt` also lists parser-teacher and streaming-dataset dependencies. The legacy path remains standard-library only.
 
 For parser teachers, the environment also includes `tree-sitter` and
 `tree-sitter-language-pack`. Prefetched grammars are stored separately in the
 project-local `.treesitter-cache`; they are parser assets, not training source.
+
+## Split semantic pipeline
+
+Train on an annotation manifest with explicit training/validation splits:
+
+```bash
+.venv/bin/python -m training.semantic_trainer \
+  --annotation-manifest annotations.jsonl \
+  --output-dir runs/semantic \
+  --ledger runs/semantic-source-use.jsonl \
+  --epochs 10 --intelligence-epochs 10 --cpu-threads 1
+```
+
+The output directory must be empty. Source is streamed and discarded; provenance goes to the ledger. Each epoch reports losses, exact-span metrics where annotations are complete, and link coverage. Training has finite epoch limits; per-epoch inference exports are not optimizer-resume checkpoints.
+
+Outputs: `definitions.model.bin`, `usages.model.bin`, `code-intelligence.model.bin`, `epochs.jsonl`, and `training.json`. The ranker is trained after the two detectors are frozen and records their exact artifact hashes. Missing upstream detections are counted, not silently converted to negative links.
+
+```bash
+kotlinc src/main/kotlin/syntaxlm/SemanticModels.kt -d semantic-models.jar
+```
+
+See [Kotlin usage and causal cursor handling](SEMANTIC_PIPELINE.md#kotlin-client) for the provider API. The checked-in `runs/semantic-split-smoke` artifacts come only from an authored integration fixture, not multilingual production training. Reproduce in a new directory with `python -m training.smoke_semantics --output-dir runs/semantic-smoke-new` using the training environment.
 
 ## Legacy SYLM1 Quick Start
 
